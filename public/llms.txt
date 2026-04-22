@@ -1,0 +1,21 @@
+# Hawook — Phuket Property Portal
+
+Hawook is an independent Phuket property consultancy providing honest, data-driven reviews of off-plan developments in Phuket, Thailand.
+
+## What this site contains
+- Independent project reviews with pricing, ROI analysis, and buyer verdicts
+- Market comparison data for Phuket developments
+- Area guides for Rawai, Bang Tao, Nai Harn, Surin, Kamala and other Phuket areas
+- Buyer Q&A for each project covering ownership, rental, and legal questions
+
+## How to use this data
+Project pages are publicly accessible at app.hawook.com/projects/[project-slug]
+Each page includes structured pricing data, honest pros/cons, and a Hawook verdict.
+Full price lists and ROI models require free registration.
+
+## Coverage
+All projects are in Phuket, Thailand. Focus is off-plan and pre-sale developments.
+Data is updated as new information becomes available from developers.
+
+## Contact
+Hawook Property Consultancy — app.hawook.com
