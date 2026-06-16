@@ -34,9 +34,32 @@ export default async function ProjectPage({ params }: Props) {
   const { slug } = await params
   const supabase = await createClient()
 
+  // Explicit column list — internal fields (hawook_score, hawook_score_dimensions,
+  // description_private, investment_notes, data_confidence, flagged_fields,
+  // source_file_url, extraction_notes, etc.) are intentionally excluded
   const { data: projectData } = await supabase
     .from('projects')
-    .select('*')
+    .select(`
+      id, project_name, developer_name, location, area,
+      price_min, price_max, unit_sizes, unit_types,
+      handover_date, payment_plan, rental_yield_claim,
+      foreign_quota_available, ownership_type, target_buyer_type,
+      nearby_landmarks, status, slug,
+      total_units, floors, buildings, construction_status,
+      rental_program_available, foreign_quota_units_remaining,
+      facilities, developer_track_record, developer_awards,
+      cover_image_url, cover_image_type, gallery_urls, gallery_types,
+      floorplan_urls, video_urls, google_maps_url, virtual_tour_url,
+      description_public, buyer_qa, market_comparison, roi_model,
+      unit_price_list, unique_features,
+      cam_fee_thb_sqm, sinking_fund_thb_sqm,
+      price_per_sqm_min, price_per_sqm_max,
+      furniture_included, furniture_notes, management_company,
+      seo_title, seo_description, seo_focus_keyword, seo_keywords,
+      hawook_intro, hawook_take, design_commentary, investment_commentary,
+      hawook_verdict, hawook_badge,
+      page_status, published_at, last_updated, created_at, location_description
+    `)
     .eq('slug', slug)
     .single()
 
@@ -388,7 +411,7 @@ export default async function ProjectPage({ params }: Props) {
         <div className="border-t border-gray-100 pt-8">
           <div className="flex flex-col sm:flex-row gap-3">
             <a
-              href="https://wa.me/66000000000"
+              href="https://wa.me/66805100129"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-[#25D366] text-white font-medium px-6 py-3 rounded-md hover:opacity-90 transition-opacity"
@@ -398,14 +421,10 @@ export default async function ProjectPage({ params }: Props) {
               </svg>
               WhatsApp us
             </a>
-            <a
-              href="https://tally.so/r/RGJy9J"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-md hover:border-gray-400 transition-colors"
-            >
-              Take our buyer quiz
-            </a>
+            {/* TODO Tier 2 Task 1: Replace with native lead capture form writing to leads table */}
+            <div className="inline-flex items-center justify-center border border-gray-200 text-gray-400 text-sm px-6 py-3 rounded-md bg-gray-50">
+              Lead capture form coming soon — for now, please use WhatsApp or email codi@hawook.com
+            </div>
             {user && <FollowButton userId={user.id} projectId={id} />}
           </div>
         </div>

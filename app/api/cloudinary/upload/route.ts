@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
+import { createClient } from '@/lib/supabase/server'
+import { isAdmin } from '@/lib/admin'
 
 export const runtime = 'nodejs'
 
@@ -14,6 +16,16 @@ function signRequest(params: Record<string, string>, apiSecret: string): string 
 
 export async function POST(request: NextRequest) {
   try {
+    // Task 2: Auth guard — admin only
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    if (!isAdmin(user.email)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
     const apiKey = process.env.CLOUDINARY_API_KEY
     const apiSecret = process.env.CLOUDINARY_API_SECRET

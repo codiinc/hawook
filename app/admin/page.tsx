@@ -1,10 +1,9 @@
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export default async function AdminPage() {
-  const supabase = await createClient()
-
-  const { data: projects } = await supabase
+  // Use service role so RLS doesn't filter to published-only
+  const { data: projects } = await supabaseAdmin
     .from('projects')
     .select('id, project_name, slug, area, status, data_confidence, cover_image_url, hawook_intro, seo_title, flagged_fields, page_status, extracted_at')
     .order('extracted_at', { ascending: false, nullsFirst: false })

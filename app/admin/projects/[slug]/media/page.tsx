@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import MediaPanel from './MediaPanel'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -12,9 +12,9 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function MediaPage({ params }: Props) {
   const { slug } = await params
-  const supabase = await createClient()
 
-  const { data } = await supabase
+  // Use service role so RLS doesn't block draft projects
+  const { data } = await supabaseAdmin
     .from('projects')
     .select('id, project_name, slug, cover_image_url, cover_image_type, gallery_urls, gallery_types, floorplan_urls, video_urls, google_maps_url, virtual_tour_url')
     .eq('slug', slug)
