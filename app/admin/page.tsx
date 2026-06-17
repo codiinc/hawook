@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import StatusToggle from './StatusToggle'
 
 export default async function AdminPage() {
   // Use service role so RLS doesn't filter to published-only
@@ -65,7 +66,7 @@ export default async function AdminPage() {
                     {/* Project name */}
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
                       {slug ? (
-                        <Link href={`/admin/projects/${slug}/media`} className="hover:text-teal transition-colors">
+                        <Link href={`/admin/projects/${slug}/overview`} className="hover:text-teal transition-colors">
                           {p.project_name as string}
                         </Link>
                       ) : (
@@ -132,7 +133,14 @@ export default async function AdminPage() {
 
                     {/* Page status */}
                     <td className="px-4 py-3">
-                      <PageStatusBadge value={p.page_status as string | null} />
+                      {slug ? (
+                        <StatusToggle
+                          slug={slug}
+                          initialStatus={(p.page_status as 'draft' | 'published' | 'archived' | null)}
+                        />
+                      ) : (
+                        <PageStatusBadge value={p.page_status as string | null} />
+                      )}
                     </td>
 
                     {/* Actions */}
@@ -141,10 +149,10 @@ export default async function AdminPage() {
                         {slug ? (
                           <>
                             <Link
-                              href={`/admin/projects/${slug}/media`}
+                              href={`/admin/projects/${slug}/overview`}
                               className="text-xs text-teal hover:text-teal-dark font-medium whitespace-nowrap"
                             >
-                              Edit media
+                              Manage
                             </Link>
                             <span className="text-gray-200">|</span>
                             <Link
