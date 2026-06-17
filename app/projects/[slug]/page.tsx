@@ -12,6 +12,17 @@ import HawookBadge from '@/components/HawookBadge'
 import HawookTake from '@/components/HawookTake'
 import MarkdownContent from '@/components/MarkdownContent'
 
+const DOC_TYPE_LABELS: Record<string, string> = {
+  sales_presentation: 'Sales Presentation',
+  brochure: 'Brochure',
+  price_list: 'Price List',
+  payment_plan: 'Payment Plan',
+  foreign_quota_letter: 'Foreign Quota Letter',
+  floor_plan_set: 'Floor Plan Set',
+  spa_template: 'SPA Template',
+  other: 'Other',
+}
+
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -119,6 +130,14 @@ export default async function ProjectPage({ params }: Props) {
   const verdict = parseVerdict(hawookVerdict)
   const allQA = Array.isArray(buyerQARaw) ? (buyerQARaw as BuyerQA[]) : []
   const publicQA = allQA.filter((q) => q.visibility === 'public')
+
+  // Documents — RLS automatically filters: anon gets is_gated=false only; auth gets all
+  const { data: projectDocuments } = await supabase
+    .from('project_documents')
+    .select('id, document_type, cloudinary_url, filename, is_gated')
+    .eq('project_id', id)
+    .order('document_type', { ascending: true })
+  const docList = (projectDocuments ?? []) as Record<string, unknown>[]
 
   // Gated, member-only fields. Read from the base `projects` table, which still
   // grants SELECT to the authenticated role. Anonymous visitors never fetch
@@ -395,6 +414,45 @@ export default async function ProjectPage({ params }: Props) {
             {developerAwards && (
               <p className="text-sm text-gray-500 italic">{developerAwards}</p>
             )}
+          </div>
+        )}
+
+        {/* Documents */}
+        {docList.length > 0 && (
+          <div className="mb-10 border-t border-gray-100 pt-8">
+            <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Downloads</h2>
+            <ul className="space-y-2">
+              {docList.map(doc => {
+                const label = DOC_TYPE_LABELS[doc.document_type as string] ?? String(doc.document_type)
+                const isGated = doc.is_gated as boolean
+                return (
+                  <li key={doc.id as string} className="flex items-center gap-3 bg-gray-50 rounded-lg px-4 py-3">
+                    <span className="text-xl shrink-0">📄</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900">{(doc.filename as string) ?? label}</p>
+                      <p className="text-xs text-gray-400">{label}</p>
+                    </div>
+                    {isGated && !user ? (
+                      <Link
+                        href="/login"
+                        className="text-xs text-teal hover:underline shrink-0"
+                      >
+                        Sign in to download
+                      </Link>
+                    ) : (
+                      <a
+                        href={doc.cloudinary_url as string}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-teal hover:underline shrink-0"
+                      >
+                        Download
+                      </a>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
           </div>
         )}
 
