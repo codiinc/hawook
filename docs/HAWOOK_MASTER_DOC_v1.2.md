@@ -1,7 +1,7 @@
 # HAWOOK — INTERNAL MASTER DOCUMENT
 
-**Version:** 1.0
-**Date:** 16 June 2026
+**Version:** 1.2
+**Date:** 17 June 2026
 **Status:** Living document — updated as the business evolves
 **Owners:** Founder, Yogi (Operations)
 
@@ -399,6 +399,8 @@ Every listed project gets a 100–150 word public-facing paragraph explaining th
 - Always end with who it suits — buyers want to feel seen, not sold to
 - Comparative pointers are welcome — buyers comparing two Hawook projects are still buying from Hawook
 
+**Database column note:** This qualitative paragraph is stored in the `hawook_take` column on the `projects` table. A separate field, `hawook_verdict`, stores structured BUY IF | SKIP IF | WATCH FOR cards (pipe-delimited, e.g. `"BUY IF: ... | SKIP IF: ... | WATCH FOR: ..."`). These are two distinct, complementary features — both are public and both are rendered on project detail pages. `hawook_take` is the prose paragraph described in this section. `hawook_verdict` is the structured cards. Do not conflate them.
+
 ### 2.9 Public-Facing Explanation Copy
 
 This appears on the About page and "How Hawook Curates" page, and should be referenced (briefly) on project pages.
@@ -470,6 +472,15 @@ Sections to be added to this master doc as they're decided. Each gets its own do
 
 ---
 
-**End of Master Document v1.0.**
+## CHANGELOG
 
-*Owner of this document: Founder. Last review: 16 June 2026. Next scheduled review: end of July 2026. Any team member can propose edits; only Founder approves changes.*
+| Version | Date | Change |
+|---|---|---|
+| 1.0 | 16 June 2026 | Initial version — project overview, Hawook Score system, scoring workflow |
+| 1.2 | 17 June 2026 | `hawook_take` vs `hawook_verdict` naming clarified — `hawook_take` is the prose paragraph (Hawook's Take), `hawook_verdict` is the structured BUY IF | SKIP IF | WATCH FOR cards. Clarifying note added to Section 2.8. |
+
+---
+
+**End of Master Document v1.2.**
+
+*Owner of this document: Founder. Last review: 17 June 2026. Next scheduled review: end of July 2026. Any team member can propose edits; only Founder approves changes.*

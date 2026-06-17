@@ -18,7 +18,7 @@ Hawook helps international buyers find the best freehold property in Thailand, s
 
 Revenue goal: 20M THB/year in agency commission by end of 2028 (~50 closed deals/year at ~400K THB avg commission). Year 1 target: 2–4M THB and 5–10 closed deals to prove the funnel.
 
-Full positioning, principles, and revenue model in `docs/HAWOOK_MASTER_DOC_v1.1.md`.
+Full positioning, principles, and revenue model in `docs/HAWOOK_MASTER_DOC_v1.2.md`.
 
 ---
 
@@ -229,9 +229,9 @@ Items flagged during execution, deferred not forgotten:
 
 ## ALL SPEC DOCS IN /docs/
 
-- `HAWOOK_MASTER_DOC_v1.1.md` — orientation, business model, principles, tech stack
+- `HAWOOK_MASTER_DOC_v1.2.md` — orientation, business model, principles, tech stack
 - `HAWOOK_VOICE_KNOWLEDGE_BASE.md` — tone, glossary, common Q&A, area knowledge, honesty boundaries
-- `HAWOOK_LEAD_PLAYBOOK_v1.1.md` — 11 stages, qualifying, cadence, message frameworks
+- `HAWOOK_LEAD_PLAYBOOK_v1.2.md` — 11 stages, qualifying, cadence, message frameworks
 - `HAWOOK_CONTENT_OPS_SPEC.md` — Yogi's Claude + MCP + approval workflow
 - `HAWOOK_AI_CONCIERGE_SPEC.md` — public-facing chat agent spec
 - `HAWOOK_EMAIL_TEMPLATES.md` — 14 plain-text templates verbatim
@@ -245,7 +245,7 @@ Items flagged during execution, deferred not forgotten:
 If this chat closes or a new conversation starts:
 
 1. Read this file first.
-2. Read `docs/HAWOOK_MASTER_DOC_v1.1.md` for full business context.
+2. Read `docs/HAWOOK_MASTER_DOC_v1.2.md` for full business context.
 3. Read `docs/HAWOOK_TIER2_PHASE1_COWORK_BRIEF.md` if next action is build work.
 4. Check current commit hash in repo against the "Latest commit" line above — confirms where execution actually is.
 5. Confirm Tier 2 Session 3 is next (assuming Session 2 was the last completed).

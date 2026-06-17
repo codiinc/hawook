@@ -1,10 +1,10 @@
 # HAWOOK — LEAD HANDLING PLAYBOOK
 
-**Version:** 1.0
-**Date:** 16 June 2026
+**Version:** 1.2
+**Date:** 17 June 2026
 **Status:** Living document
 **Owners:** Founder (strategic), Yogi (operational owner)
-**Companion to:** Hawook Master Document v1.0
+**Companion to:** Hawook Master Document v1.2
 
 ---
 
@@ -397,7 +397,7 @@ Anything missing blocks the stage move. Yogi captures what's missing before adva
 
 ## APPENDIX: VERSIONING & FEEDBACK
 
-This is v1.0. Expected updates as we learn:
+This is v1.2. Expected updates as we learn:
 
 - Message templates and example flows once we have 30+ real leads through the system
 - Specific cadences refined based on what actually converts
@@ -408,4 +408,4 @@ Yogi maintains a running list of edge cases and friction points. Reviewed monthl
 
 ---
 
-**End of Lead Handling Playbook v1.0.**
+**End of Lead Handling Playbook v1.2.**
