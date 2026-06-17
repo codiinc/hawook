@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { formatPriceFrom } from '@/lib/format'
 import type { Project } from '@/lib/types'
+import HawookBadge from '@/components/HawookBadge'
 
 type Props = {
   project: Project
@@ -44,6 +45,11 @@ export default function ProjectCard({ project }: Props) {
             </span>
           )}
         </div>
+        {project.hawook_badge && (
+          <div className="mb-2">
+            <HawookBadge badge={project.hawook_badge} />
+          </div>
+        )}
         <p className="text-sm font-medium text-gray-900 mb-3">
           {formatPriceFrom(project.price_min)}
         </p>
