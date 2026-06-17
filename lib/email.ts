@@ -1,6 +1,11 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy-initialize so builds without RESEND_API_KEY don't throw at module load
+let _resend: Resend | null = null
+function getResend(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY)
+  return _resend
+}
 
 export type EmailSender = 'hello' | 'system' | 'yogi' | 'codi'
 
@@ -24,7 +29,7 @@ export async function sendEmail(params: SendEmailParams) {
   const sender = SENDER_MAP[params.from]
 
   try {
-    const result = await resend.emails.send({
+    const result = await getResend().emails.send({
       from: `${sender.name} <${sender.email}>`,
       to: params.to,
       subject: params.subject,
