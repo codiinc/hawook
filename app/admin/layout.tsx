@@ -27,7 +27,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </Link>
             <span className="text-gray-300">|</span>
             <Link href="/admin" className="text-sm font-medium text-gray-900">
-              Admin
+              Projects
+            </Link>
+            <Link href="/admin/queue" className="text-sm font-medium text-gray-700 hover:text-gray-900">
+              Queue
+            </Link>
+            <Link href="/admin/audit" className="text-sm font-medium text-gray-700 hover:text-gray-900">
+              Audit
             </Link>
           </div>
           <span className="text-xs text-gray-400">{user?.email}</span>
