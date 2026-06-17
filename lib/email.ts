@@ -29,7 +29,7 @@ export async function sendEmail(params: SendEmailParams) {
       to: params.to,
       subject: params.subject,
       text: params.text,
-      reply_to: params.replyTo,
+      replyTo: params.replyTo,
       tags: params.tags,
     })
     return { success: true, data: result }
