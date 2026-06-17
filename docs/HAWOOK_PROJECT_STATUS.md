@@ -1,14 +1,14 @@
 # HAWOOK — PROJECT STATUS
 
 **Version:** v1 — current state snapshot
-**Last updated:** 17 June 2026 (Session 3)
+**Last updated:** 17 June 2026 (Session 4)
 **Purpose:** If this chat is lost or a new conversation starts, this document brings any AI assistant (or human) up to current state in 5 minutes of reading.
 
 ---
 
 ## ONE-LINE STATUS
 
-Tier 1 complete and verified. Tier 2 Phase 1 mid-execution — Sessions 1, 2, and 3 of 5 complete. Public lead capture form is live, Hawook Score badges render, full project detail admin view with 8 tabs built, documents system operational. Sessions 4 and 5 remain (approval queue, audit log, cron jobs). Pending external dependency: Resend domain DNS verification by Yogi.
+Tier 1 complete and verified. Tier 2 Phase 1 mid-execution — Sessions 1, 2, 3, and 4 of 5 complete. Approval queue UI, audit log page, and full Postgres approval transaction function all built and smoke-tested. Session 5 remains (cron jobs + full Phase 1 smoke test). Pending external dependency: Resend domain DNS verification by Yogi. Vercel env var to add: `PROPOSAL_WEBHOOK_SECRET=hwk-wh-prop-phase1`.
 
 ---
 
@@ -56,7 +56,7 @@ Full positioning, principles, and revenue model in `docs/HAWOOK_MASTER_DOC_v1.2.
 - Repo: https://github.com/codiinc/hawook
 - Production branch: `main`
 - Live URL: `hawook.vercel.app` (custom domain `app.hawook.com` pending DNS)
-- Latest commit: `f7631fd` (Session 3 complete — Tasks 6, 10, 11 + TS fix)
+- Latest commit: (see git log — Session 4 complete — Tasks 8, 9, 13)
 - Vercel project linked, auto-deploys on push to main
 
 ### Vercel environment variables set
@@ -75,6 +75,7 @@ Full positioning, principles, and revenue model in `docs/HAWOOK_MASTER_DOC_v1.2.
 - `CRON_SECRET`
 - `BEEHIIV_API_KEY`
 - `BEEHIIV_PUBLICATION_ID`
+- `PROPOSAL_WEBHOOK_SECRET` = `hwk-wh-prop-phase1` (**PENDING — must be added before major proposal webhook alerts fire**)
 
 ### Supabase tables (activated through Tier 2 Session 1)
 
@@ -158,6 +159,21 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 | Task 11 — Documents tab | ✅ Documents tab inside project admin: 8 document types, PDF-only Cloudinary upload with XHR progress, gated/public toggle per file, delete confirmation. API routes: POST/DELETE/PATCH. Public project page shows Downloads section (RLS-gated automatically). |
 | TS fix | ✅ `summary_internal` cast to `string | null` in updates tab to resolve TS2322. |
 
+### Tier 2 Phase 1 Session 4 — Content ops core (DONE)
+
+| Task | Outcome |
+|---|---|
+| Task 13 — Approval transaction function | ✅ `execute_proposal_approval` PL/pgSQL function with full rollback, `FOR UPDATE` lock (anti-race), field-existence validation, type-compatibility checking, dynamic SQL casting, soft numeric validation (>20% → force major), `project_updates` insert if `related_update_entry` present, `notify_followers` override via `p_notification_hold`, audit_log write with full diff JSONB. `SECURITY DEFINER + search_path` set. Granted to authenticated + service_role. |
+| Task 13 — Major proposal webhook trigger | ✅ `pg_net` extension enabled. `app_config` table for base URL + secret (avoids `ALTER DATABASE` superuser requirement). Trigger fires AFTER INSERT WHEN severity='major'. EXCEPTION handler ensures trigger never blocks insert. |
+| Task 13 — Approval library | ✅ `lib/proposals.ts` — `executeApproval`, `rejectProposal`, `deferProposal`. Patches edited fields onto proposal before calling RPC (supports "Approve & edit" flow). |
+| Task 8 — API routes | ✅ `GET /api/admin/proposals` (filtered, JS-sorted major→standard→minor), `POST .../[id]/approve`, `.../reject`, `.../defer`. All approver-only routes have server-side `isApprover` recheck. `POST .../approve` also calls `GET /api/webhooks/major-proposal-created` for alert. |
+| Task 9 — Audit API | ✅ `GET /api/admin/audit` — paginated 50/page, filterable by action, actor_email, target_table, target_slug, date_from, date_to. |
+| Task 8 — Queue UI | ✅ `/admin/queue` — server + client components. Severity filter, status filter, text search. Expandable proposals with field diffs (current vs proposed, amber highlight). Edit mode per proposal. Actions: Approve, Approve & edit, Approve+hold notifications, Reject, Defer. Bulk approve minor with confirmation modal. View-only banner when `canApprove=false`. |
+| Task 9 — Audit log UI | ✅ `/admin/audit` — read-only chronological log. Filter bar (action, actor, table, slug, date range). Expandable rows with formatted metadata JSON + link to project admin. Paginated. |
+| Admin nav | ✅ Layout updated: Projects · Queue · Audit links. |
+| Webhook alert route | ✅ `POST /api/webhooks/major-proposal-created` — Bearer token auth against `PROPOSAL_WEBHOOK_SECRET`. Sends `renderMajorProposalAlert` via `sendEmail` to each approver. `Promise.allSettled` so one failure doesn't abort. |
+| Smoke test — 4 proposals | ✅ All passed: proposal 1 (minor, field update), proposal 2 (standard, multi-field + update entry, `notify_followers=true` confirmed), proposal 3 (major, `notify_followers=false` via hold), proposal 4 (bad field → `status='failed'` with exact error in `review_notes`). All 3 audit_log entries written correctly. |
+
 ### Notable decisions locked during execution
 
 - **Service-role bypass is canonical for admin access** — not role-column RLS. Email whitelist at application layer.
@@ -172,8 +188,8 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 
 | Session | Tasks | Theme |
 |---|---|---|
-| ~~Session 3~~ | ~~Tasks 6, 10, 11~~ | ~~Admin extensions: page status toggle, project detail admin view (8 tabs), documents section~~  ✅ DONE |
-| Session 4 | Tasks 8, 9, 13 | Content ops core: approval queue, audit log page, approval flow execution code |
+| ~~Session 3~~ | ~~Tasks 6, 10, 11~~ | ~~Admin extensions: page status toggle, project detail admin view (8 tabs), documents section~~ ✅ DONE |
+| ~~Session 4~~ | ~~Tasks 8, 9, 13~~ | ~~Content ops core: approval queue, audit log page, approval flow execution code~~ ✅ DONE |
 | Session 5 | Tasks 12, 14 | Cron jobs (3) + full Phase 1 smoke test |
 
 Brief: `docs/HAWOOK_TIER2_PHASE1_COWORK_BRIEF.md`. All 14 task definitions in there.
@@ -258,8 +274,9 @@ If this chat closes or a new conversation starts:
 2. Read `docs/HAWOOK_MASTER_DOC_v1.2.md` for full business context.
 3. Read `docs/HAWOOK_TIER2_PHASE1_COWORK_BRIEF.md` if next action is build work.
 4. Check current commit hash in repo against the "Latest commit" line above — confirms where execution actually is.
-5. Confirm Tier 2 Session 4 is next (Sessions 1, 2, 3 complete).
-6. Open relevant spec doc for whatever specific work is being picked up.
+5. Confirm Tier 2 Session 5 is next (Sessions 1–4 complete).
+6. Before Session 5: ensure `PROPOSAL_WEBHOOK_SECRET=hwk-wh-prop-phase1` is set in Vercel env vars (needed for major proposal alert webhook auth).
+7. Open relevant spec doc for whatever specific work is being picked up.
 
 ---
 
