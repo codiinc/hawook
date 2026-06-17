@@ -68,7 +68,7 @@ export default async function UpdatesPage({ params }: Props) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-900">{update.summary_public as string}</p>
-                  {update.summary_internal && (
+                  {(update.summary_internal as string | null) && (
                     <p className="text-xs text-gray-500 mt-1 italic">{update.summary_internal as string}</p>
                   )}
                 </div>
