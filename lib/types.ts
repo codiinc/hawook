@@ -20,6 +20,8 @@ export type Project = {
   design_commentary: string | null
   investment_commentary: string | null
   hawook_verdict: string | null
+  hawook_badge: string | null
+  description_public: string | null
   location_description: string | null
   nearby_landmarks: string | null
   facilities: string | null

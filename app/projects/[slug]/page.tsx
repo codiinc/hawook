@@ -7,6 +7,10 @@ import { formatPriceFrom, parseVerdict } from '@/lib/format'
 import type { BuyerQA } from '@/lib/types'
 import FollowButton from './FollowButton'
 import GatedContentTracker from './GatedContentTracker'
+import LeadForm from './LeadForm'
+import HawookBadge from '@/components/HawookBadge'
+import HawookTake from '@/components/HawookTake'
+import MarkdownContent from '@/components/MarkdownContent'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -92,7 +96,9 @@ export default async function ProjectPage({ params }: Props) {
   const constructionStatus = s('construction_status')
   const coverImageUrl = s('cover_image_url')
   const hawookIntro = s('hawook_intro')
-  const hawookTake = s('hawook_take')
+  const hawookTakeText = s('hawook_take')
+  const hawookBadge = s('hawook_badge')
+  const descriptionPublic = s('description_public')
   const designCommentary = s('design_commentary')
   const hawookVerdict = s('hawook_verdict')
   const locationDescription = s('location_description')
@@ -190,8 +196,9 @@ export default async function ProjectPage({ params }: Props) {
             {projectName}
           </h1>
           {developerName && (
-            <p className="text-gray-500">by {developerName}</p>
+            <p className="text-gray-500 mb-3">by {developerName}</p>
           )}
+          {hawookBadge && <HawookBadge badge={hawookBadge} />}
         </div>
 
         {/* Cover image */}
@@ -231,17 +238,15 @@ export default async function ProjectPage({ params }: Props) {
           </div>
         )}
 
-        {/* Hawook Take */}
-        {hawookTake && (
-          <div className="mb-10 bg-cream rounded-lg p-6">
-            <p className="text-xs font-semibold text-teal uppercase tracking-widest mb-3">Hawook Take</p>
-            <div className="text-gray-700 leading-relaxed">
-              {hawookTake.split('\n\n').map((para, i) => (
-                <p key={i} className="mb-3 last:mb-0">{para}</p>
-              ))}
-            </div>
+        {/* Description (markdown) */}
+        {descriptionPublic && (
+          <div className="mb-10">
+            <MarkdownContent content={descriptionPublic} />
           </div>
         )}
+
+        {/* Hawook's Take */}
+        <HawookTake take={hawookTakeText} />
 
         {/* Design & Layout */}
         {designCommentary && (
@@ -399,42 +404,98 @@ export default async function ProjectPage({ params }: Props) {
             <GatedContentTracker projectSlug={slug} />
             <GatedContent
               unitPriceList={unitPriceListRaw}
-            roiModel={roiModelRaw}
-            investmentCommentary={investmentCommentary}
-            privateQA={privateQA}
-            camFee={camFee}
-            sinkingFund={sinkingFund}
-            foreignQuotaAvailable={foreignQuotaAvailable}
-          />
+              roiModel={roiModelRaw}
+              investmentCommentary={investmentCommentary}
+              privateQA={privateQA}
+              camFee={camFee}
+              sinkingFund={sinkingFund}
+              foreignQuotaAvailable={foreignQuotaAvailable}
+            />
           </>
         ) : (
-          <div className="mb-10 border border-gray-200 rounded-xl p-8 bg-cream">
-            <h3 className="font-serif text-xl font-medium text-gray-900 mb-3">Sign up free to unlock</h3>
-            <ul className="space-y-2 mb-6">
-              {['Full price list by unit', 'ROI model with real numbers', 'Floorplans', 'Price per sqm analysis', 'Private buyer Q&A'].map((item) => (
-                <li key={item} className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-teal">✓</span> {item}
-                </li>
-              ))}
-            </ul>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/signup"
-                className="inline-flex items-center justify-center bg-teal text-white font-medium px-6 py-3 rounded-md hover:bg-teal-dark transition-colors"
-              >
-                Sign up free
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                Already have an account? Sign in
-              </Link>
+          <div className="mb-10 relative">
+            {/* Blurred placeholder — purely visual; no gated data is fetched for anonymous users */}
+            <div className="blur-sm pointer-events-none select-none" aria-hidden="true">
+              <div className="space-y-6">
+                <div>
+                  <div className="h-5 bg-gray-200 rounded w-40 mb-4" />
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          {['Unit type', 'Size', 'Floor', 'Price', '฿/sqm'].map((h) => (
+                            <th key={h} className="text-left py-2 pr-4 text-gray-400 font-medium">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[1, 2, 3].map((i) => (
+                          <tr key={i} className="border-b border-gray-100">
+                            {[1, 2, 3, 4, 5].map((j) => (
+                              <td key={j} className="py-2 pr-4">
+                                <div className="h-4 bg-gray-200 rounded" style={{ width: `${60 + j * 10}%` }} />
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="border border-gray-200 rounded-lg p-5">
+                      <div className="h-4 bg-gray-200 rounded w-24 mb-3" />
+                      <div className="space-y-2">
+                        {[1, 2, 3].map((j) => (
+                          <div key={j} className="flex justify-between">
+                            <div className="h-3 bg-gray-200 rounded w-28" />
+                            <div className="h-3 bg-gray-200 rounded w-16" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Unlock overlay */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 rounded-xl px-6 py-8">
+              <div className="text-center max-w-sm">
+                <div className="w-10 h-10 bg-teal-light rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-teal">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+                <h3 className="font-serif text-lg font-medium text-gray-900 mb-2">Sign up to view full details</h3>
+                <p className="text-sm text-gray-500 mb-5">Floor plans, full price list, ROI model, price per sqm analysis, and private buyer Q&amp;A — free with a Hawook account.</p>
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/signup"
+                    className="inline-flex items-center justify-center bg-teal text-white font-medium px-6 py-2.5 rounded-md hover:bg-teal-dark transition-colors text-sm"
+                  >
+                    Sign up free
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center justify-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  >
+                    Already have an account? Sign in
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Contact section */}
+        {/* Lead capture form */}
+        <div className="mb-10">
+          <LeadForm projectSlug={slug} projectName={projectName} />
+        </div>
+
+        {/* Follow + WhatsApp */}
         <div className="border-t border-gray-100 pt-8">
           <div className="flex flex-col sm:flex-row gap-3">
             <a
@@ -448,10 +509,6 @@ export default async function ProjectPage({ params }: Props) {
               </svg>
               WhatsApp us
             </a>
-            {/* TODO Tier 2 Task 1: Replace with native lead capture form writing to leads table */}
-            <div className="inline-flex items-center justify-center border border-gray-200 text-gray-400 text-sm px-6 py-3 rounded-md bg-gray-50">
-              Lead capture form coming soon — for now, please use WhatsApp or email codi@hawook.com
-            </div>
             {user && <FollowButton userId={user.id} projectId={id} />}
           </div>
         </div>
