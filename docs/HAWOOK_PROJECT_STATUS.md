@@ -1,14 +1,14 @@
 # HAWOOK — PROJECT STATUS
 
 **Version:** v1 — current state snapshot
-**Last updated:** 17 June 2026
+**Last updated:** 17 June 2026 (Session 3)
 **Purpose:** If this chat is lost or a new conversation starts, this document brings any AI assistant (or human) up to current state in 5 minutes of reading.
 
 ---
 
 ## ONE-LINE STATUS
 
-Tier 1 complete and verified. Tier 2 Phase 1 mid-execution — Sessions 1 and 2 of 5 complete. Public lead capture form is live, Hawook Score badges render, content ops + admin sessions still ahead. Pending external dependency: Resend domain DNS verification by Yogi.
+Tier 1 complete and verified. Tier 2 Phase 1 mid-execution — Sessions 1, 2, and 3 of 5 complete. Public lead capture form is live, Hawook Score badges render, full project detail admin view with 8 tabs built, documents system operational. Sessions 4 and 5 remain (approval queue, audit log, cron jobs). Pending external dependency: Resend domain DNS verification by Yogi.
 
 ---
 
@@ -56,7 +56,7 @@ Full positioning, principles, and revenue model in `docs/HAWOOK_MASTER_DOC_v1.2.
 - Repo: https://github.com/codiinc/hawook
 - Production branch: `main`
 - Live URL: `hawook.vercel.app` (custom domain `app.hawook.com` pending DNS)
-- Latest commit: `2aab796` (Session 2 + lazy-init fix)
+- Latest commit: `f7631fd` (Session 3 complete — Tasks 6, 10, 11 + TS fix)
 - Vercel project linked, auto-deploys on push to main
 
 ### Vercel environment variables set
@@ -148,6 +148,16 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 | Bug fix | ✅ Resend client lazy-init prevents build-time throw |
 | Schema correction | ✅ budget_bracket and timeline check constraints updated from dead quiz-flow values to brief's form labels |
 
+### Tier 2 Phase 1 Session 3 — Admin extensions (DONE)
+
+| Task | Outcome |
+|---|---|
+| Task 6 — Page status toggle | ✅ `StatusToggle` client component + `PATCH /api/admin/projects/[slug]/status` route. Confirmation modals per status. Audit log writes on every change. Admin list page updated. |
+| Task 10 — Project detail admin view | ✅ `/admin/projects/[slug]/` nested layout with 8-tab nav (Overview, Public Content, Structured Data, Hawook Score, Updates, Media, Documents, Followers). Server-side auth guard. Tab-aware `usePathname` active states. |
+| Task 10 tabs built | ✅ Overview (stats + recent audit), Public Content form, Structured Data form, Hawook Score form (approver-only, live calc, badge preview), Updates list, Media (existing, migrated to sub-layout), Followers (anonymized). |
+| Task 11 — Documents tab | ✅ Documents tab inside project admin: 8 document types, PDF-only Cloudinary upload with XHR progress, gated/public toggle per file, delete confirmation. API routes: POST/DELETE/PATCH. Public project page shows Downloads section (RLS-gated automatically). |
+| TS fix | ✅ `summary_internal` cast to `string | null` in updates tab to resolve TS2322. |
+
 ### Notable decisions locked during execution
 
 - **Service-role bypass is canonical for admin access** — not role-column RLS. Email whitelist at application layer.
@@ -162,7 +172,7 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 
 | Session | Tasks | Theme |
 |---|---|---|
-| Session 3 | Tasks 6, 10, 11 | Admin extensions: page status toggle, project detail admin view (8 tabs), documents section in media admin |
+| ~~Session 3~~ | ~~Tasks 6, 10, 11~~ | ~~Admin extensions: page status toggle, project detail admin view (8 tabs), documents section~~  ✅ DONE |
 | Session 4 | Tasks 8, 9, 13 | Content ops core: approval queue, audit log page, approval flow execution code |
 | Session 5 | Tasks 12, 14 | Cron jobs (3) + full Phase 1 smoke test |
 
@@ -248,7 +258,7 @@ If this chat closes or a new conversation starts:
 2. Read `docs/HAWOOK_MASTER_DOC_v1.2.md` for full business context.
 3. Read `docs/HAWOOK_TIER2_PHASE1_COWORK_BRIEF.md` if next action is build work.
 4. Check current commit hash in repo against the "Latest commit" line above — confirms where execution actually is.
-5. Confirm Tier 2 Session 3 is next (assuming Session 2 was the last completed).
+5. Confirm Tier 2 Session 4 is next (Sessions 1, 2, 3 complete).
 6. Open relevant spec doc for whatever specific work is being picked up.
 
 ---
