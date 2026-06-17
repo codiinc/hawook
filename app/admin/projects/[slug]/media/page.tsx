@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import MediaPanel from './MediaPanel'
 
@@ -13,7 +12,6 @@ export async function generateMetadata({ params }: Props) {
 export default async function MediaPage({ params }: Props) {
   const { slug } = await params
 
-  // Use service role so RLS doesn't block draft projects
   const { data } = await supabaseAdmin
     .from('projects')
     .select('id, project_name, slug, cover_image_url, cover_image_type, gallery_urls, gallery_types, floorplan_urls, video_urls, google_maps_url, virtual_tour_url')
@@ -38,23 +36,5 @@ export default async function MediaPage({ params }: Props) {
     virtual_tour_url: (raw.virtual_tour_url as string) || null,
   }
 
-  return (
-    <>
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href="/admin" className="hover:text-gray-700">Projects</Link>
-        <span>›</span>
-        <span className="text-gray-900 font-medium">{project.project_name}</span>
-        <span>›</span>
-        <span>Media</span>
-      </div>
-
-      <div className="mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">{project.project_name}</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Media management</p>
-      </div>
-
-      <MediaPanel project={project} />
-    </>
-  )
+  return <MediaPanel project={project} />
 }
