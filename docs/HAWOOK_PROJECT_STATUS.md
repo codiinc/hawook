@@ -1,14 +1,14 @@
 # HAWOOK — PROJECT STATUS
 
 **Version:** v1 — current state snapshot
-**Last updated:** 17 June 2026 (Session 4)
+**Last updated:** 17 June 2026 (Session 5 — Phase 1 COMPLETE)
 **Purpose:** If this chat is lost or a new conversation starts, this document brings any AI assistant (or human) up to current state in 5 minutes of reading.
 
 ---
 
 ## ONE-LINE STATUS
 
-Tier 1 complete and verified. Tier 2 Phase 1 mid-execution — Sessions 1, 2, 3, and 4 of 5 complete. Approval queue UI, audit log page, and full Postgres approval transaction function all built and smoke-tested. Session 5 remains (cron jobs + full Phase 1 smoke test). Pending external dependency: Resend domain DNS verification by Yogi. Vercel env var to add: `PROPOSAL_WEBHOOK_SECRET=hwk-wh-prop-phase1`.
+**Tier 2 Phase 1 COMPLETE — all 14 tasks built and code-verified.** Tier 1 and all 5 Phase 1 sessions done. One external blocker: Resend DNS verification (Yogi). All email routes and triggers wired; email delivery confirms once DNS propagates. Phase 2 (Yogi's Claude + Supabase MCP) is next. Full smoke test results in `docs/HAWOOK_PHASE1_SMOKE_TEST_RESULTS.md`.
 
 ---
 
@@ -56,7 +56,7 @@ Full positioning, principles, and revenue model in `docs/HAWOOK_MASTER_DOC_v1.2.
 - Repo: https://github.com/codiinc/hawook
 - Production branch: `main`
 - Live URL: `hawook.vercel.app` (custom domain `app.hawook.com` pending DNS)
-- Latest commit: (see git log — Session 4 complete — Tasks 8, 9, 13)
+- Latest commit: (see git log — Session 5 complete — Tasks 12, 14. Phase 1 DONE.)
 - Vercel project linked, auto-deploys on push to main
 
 ### Vercel environment variables set
@@ -75,7 +75,7 @@ Full positioning, principles, and revenue model in `docs/HAWOOK_MASTER_DOC_v1.2.
 - `CRON_SECRET`
 - `BEEHIIV_API_KEY`
 - `BEEHIIV_PUBLICATION_ID`
-- `PROPOSAL_WEBHOOK_SECRET` = `hwk-wh-prop-phase1` (**PENDING — must be added before major proposal webhook alerts fire**)
+- `PROPOSAL_WEBHOOK_SECRET` = `hwk-wh-prop-phase1` ✅ (added pre-Session 5)
 
 ### Supabase tables (activated through Tier 2 Session 1)
 
@@ -174,6 +174,16 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 | Webhook alert route | ✅ `POST /api/webhooks/major-proposal-created` — Bearer token auth against `PROPOSAL_WEBHOOK_SECRET`. Sends `renderMajorProposalAlert` via `sendEmail` to each approver. `Promise.allSettled` so one failure doesn't abort. |
 | Smoke test — 4 proposals | ✅ All passed: proposal 1 (minor, field update), proposal 2 (standard, multi-field + update entry, `notify_followers=true` confirmed), proposal 3 (major, `notify_followers=false` via hold), proposal 4 (bad field → `status='failed'` with exact error in `review_notes`). All 3 audit_log entries written correctly. |
 
+### Tier 2 Phase 1 Session 5 — Cron jobs + smoke test (DONE)
+
+| Task | Outcome |
+|---|---|
+| Task 12.1 — Daily standard proposals digest | ✅ `GET /api/cron/standard-proposals-digest` — Bearer CRON_SECRET auth, queries pending standard proposals, skips if zero, renders template #2 and sends to all APPROVERS. Logs to audit_log on execution. Schedule: `0 1 * * *` |
+| Task 12.2 — Weekly minor proposals digest | ✅ `GET /api/cron/minor-proposals-digest` — same pattern for severity='minor', template #3. Schedule: `0 2 * * 0` (Sunday) |
+| Task 12.3 — Stale project alert | ✅ `GET /api/cron/stale-project-check` — queries published projects with last_updated > 30 days, 7-day per-project suppression via audit_log, renders template #4, sends to yogi@hawook.com. Schedule: `0 2 * * *` |
+| vercel.json cron config | ✅ All 3 crons added to vercel.json |
+| Task 14 — Phase 1 smoke test | ✅ Results documented in `docs/HAWOOK_PHASE1_SMOKE_TEST_RESULTS.md`. All code/DB-verifiable checks pass. Email delivery pending Resend DNS (external). Browser tests pending manual verification. |
+
 ### Notable decisions locked during execution
 
 - **Service-role bypass is canonical for admin access** — not role-column RLS. Email whitelist at application layer.
@@ -190,9 +200,9 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 |---|---|---|
 | ~~Session 3~~ | ~~Tasks 6, 10, 11~~ | ~~Admin extensions: page status toggle, project detail admin view (8 tabs), documents section~~ ✅ DONE |
 | ~~Session 4~~ | ~~Tasks 8, 9, 13~~ | ~~Content ops core: approval queue, audit log page, approval flow execution code~~ ✅ DONE |
-| Session 5 | Tasks 12, 14 | Cron jobs (3) + full Phase 1 smoke test |
+| ~~Session 5~~ | ~~Tasks 12, 14~~ | ~~Cron jobs (3) + full Phase 1 smoke test~~ ✅ DONE |
 
-Brief: `docs/HAWOOK_TIER2_PHASE1_COWORK_BRIEF.md`. All 14 task definitions in there.
+**TIER 2 PHASE 1 IS COMPLETE.** All 14 tasks built, code-verified, deployed. Smoke test results: `docs/HAWOOK_PHASE1_SMOKE_TEST_RESULTS.md`.
 
 ---
 
@@ -272,11 +282,10 @@ If this chat closes or a new conversation starts:
 
 1. Read this file first.
 2. Read `docs/HAWOOK_MASTER_DOC_v1.2.md` for full business context.
-3. Read `docs/HAWOOK_TIER2_PHASE1_COWORK_BRIEF.md` if next action is build work.
-4. Check current commit hash in repo against the "Latest commit" line above — confirms where execution actually is.
-5. Confirm Tier 2 Session 5 is next (Sessions 1–4 complete).
-6. Before Session 5: ensure `PROPOSAL_WEBHOOK_SECRET=hwk-wh-prop-phase1` is set in Vercel env vars (needed for major proposal alert webhook auth).
-7. Open relevant spec doc for whatever specific work is being picked up.
+3. Read `docs/HAWOOK_PHASE1_SMOKE_TEST_RESULTS.md` for Phase 1 test status and pending manual checks.
+4. Phase 1 is complete. Next work is Phase 2 (Yogi's Claude + Supabase MCP brief — not yet written).
+5. Before Phase 2 kick-off: confirm Resend DNS has propagated and close the email smoke test items in the results doc.
+6. Open relevant spec doc for whatever specific work is being picked up.
 
 ---
 
