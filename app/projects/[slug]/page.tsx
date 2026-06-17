@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const supabase = await createClient()
   const { data } = await supabase
-    .from('projects')
+    .from('projects_public')
     .select('project_name, seo_title, seo_description, cover_image_url')
     .eq('slug', slug)
     .single()
@@ -34,11 +34,15 @@ export default async function ProjectPage({ params }: Props) {
   const { slug } = await params
   const supabase = await createClient()
 
-  // Explicit column list — internal fields (hawook_score, hawook_score_dimensions,
-  // description_private, investment_notes, data_confidence, flagged_fields,
-  // source_file_url, extraction_notes, etc.) are intentionally excluded
+  // Public, safe-column read via the projects_public view. Internal fields
+  // (hawook_score, description_private, data_confidence, flagged_fields,
+  // source_file_url, extraction_notes, etc.) and gated/member-only fields
+  // (roi_model, unit_price_list, investment_commentary, cam/sinking fees,
+  // floorplan_urls, price_per_sqm) are NOT exposed here. buyer_qa returned by
+  // the view is already filtered to public-visibility entries. Gated fields are
+  // fetched separately below, only for authenticated users.
   const { data: projectData } = await supabase
-    .from('projects')
+    .from('projects_public')
     .select(`
       id, project_name, developer_name, location, area,
       price_min, price_max, unit_sizes, unit_types,
@@ -49,14 +53,12 @@ export default async function ProjectPage({ params }: Props) {
       rental_program_available, foreign_quota_units_remaining,
       facilities, developer_track_record, developer_awards,
       cover_image_url, cover_image_type, gallery_urls, gallery_types,
-      floorplan_urls, video_urls, google_maps_url, virtual_tour_url,
-      description_public, buyer_qa, market_comparison, roi_model,
-      unit_price_list, unique_features,
-      cam_fee_thb_sqm, sinking_fund_thb_sqm,
-      price_per_sqm_min, price_per_sqm_max,
+      video_urls, google_maps_url, virtual_tour_url,
+      description_public, buyer_qa, market_comparison,
+      unique_features,
       furniture_included, furniture_notes, management_company,
       seo_title, seo_description, seo_focus_keyword, seo_keywords,
-      hawook_intro, hawook_take, design_commentary, investment_commentary,
+      hawook_intro, hawook_take, design_commentary,
       hawook_verdict, hawook_badge,
       page_status, published_at, last_updated, created_at, location_description
     `)
@@ -91,7 +93,6 @@ export default async function ProjectPage({ params }: Props) {
   const hawookIntro = s('hawook_intro')
   const hawookTake = s('hawook_take')
   const designCommentary = s('design_commentary')
-  const investmentCommentary = s('investment_commentary')
   const hawookVerdict = s('hawook_verdict')
   const locationDescription = s('location_description')
   const nearbyLandmarks = s('nearby_landmarks')
@@ -99,8 +100,6 @@ export default async function ProjectPage({ params }: Props) {
   const developerTrackRecord = s('developer_track_record')
   const developerAwards = s('developer_awards')
   const foreignQuotaAvailable = b('foreign_quota_available')
-  const camFee = num('cam_fee_thb_sqm')
-  const sinkingFund = num('sinking_fund_thb_sqm')
   const priceMin = num('price_min')
   const unitTypes = s('unit_types')
   const unitSizes = s('unit_sizes')
@@ -109,13 +108,37 @@ export default async function ProjectPage({ params }: Props) {
   const uniqueFeatures = raw['unique_features']
   const buyerQARaw = raw['buyer_qa']
   const marketComparisonRaw = raw['market_comparison']
-  const unitPriceListRaw = raw['unit_price_list']
-  const roiModelRaw = raw['roi_model']
 
   const verdict = parseVerdict(hawookVerdict)
   const allQA = Array.isArray(buyerQARaw) ? (buyerQARaw as BuyerQA[]) : []
   const publicQA = allQA.filter((q) => q.visibility === 'public')
-  const privateQA = allQA.filter((q) => q.visibility === 'private')
+
+  // Gated, member-only fields. Read from the base `projects` table, which still
+  // grants SELECT to the authenticated role. Anonymous visitors never fetch
+  // these — and once the anon GRANT is revoked, cannot.
+  let roiModelRaw: unknown = null
+  let unitPriceListRaw: unknown = null
+  let investmentCommentary: string | null = null
+  let camFee: number | null = null
+  let sinkingFund: number | null = null
+  let privateQA: BuyerQA[] = []
+  if (user) {
+    const { data: gated } = await supabase
+      .from('projects')
+      .select('roi_model, unit_price_list, investment_commentary, cam_fee_thb_sqm, sinking_fund_thb_sqm, buyer_qa')
+      .eq('slug', slug)
+      .single()
+    if (gated) {
+      const g = gated as Record<string, unknown>
+      roiModelRaw = g.roi_model ?? null
+      unitPriceListRaw = g.unit_price_list ?? null
+      investmentCommentary = typeof g.investment_commentary === 'string' ? g.investment_commentary : null
+      camFee = typeof g.cam_fee_thb_sqm === 'number' ? g.cam_fee_thb_sqm : null
+      sinkingFund = typeof g.sinking_fund_thb_sqm === 'number' ? g.sinking_fund_thb_sqm : null
+      const fullQA = Array.isArray(g.buyer_qa) ? (g.buyer_qa as BuyerQA[]) : []
+      privateQA = fullQA.filter((q) => q.visibility === 'private')
+    }
+  }
 
   const quickFacts = [
     { label: 'Starting price', value: formatPriceFrom(priceMin) },

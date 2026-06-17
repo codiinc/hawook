@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient()
   const { data: projects } = await supabase
-    .from('projects')
+    .from('projects_public')
     .select('slug, last_updated')
     .eq('status', 'Active')
     .not('slug', 'is', null)

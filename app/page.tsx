@@ -6,7 +6,7 @@ import type { Project } from '@/lib/types'
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: projects } = await supabase
-    .from('projects')
+    .from('projects_public')
     .select('id, project_name, slug, area, price_min, construction_status, cover_image_url, hawook_intro, status')
     .eq('status', 'Active')
     .order('created_at', { ascending: false })
