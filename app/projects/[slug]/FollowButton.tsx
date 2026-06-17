@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { trackEvent } from '@/lib/analytics'
 
 export default function FollowButton({ userId, projectId }: { userId: string; projectId: string }) {
   const [following, setFollowing] = useState(false)
@@ -35,6 +36,7 @@ export default function FollowButton({ userId, projectId }: { userId: string; pr
     } else {
       await supabase.from('project_follows').insert({ user_id: userId, project_id: projectId })
       setFollowing(true)
+      trackEvent('project_followed', { project_id: projectId })
     }
     setLoading(false)
   }

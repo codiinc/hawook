@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { formatPriceFrom, parseVerdict } from '@/lib/format'
 import type { BuyerQA } from '@/lib/types'
 import FollowButton from './FollowButton'
+import GatedContentTracker from './GatedContentTracker'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -394,8 +395,10 @@ export default async function ProjectPage({ params }: Props) {
 
         {/* Gated section */}
         {user ? (
-          <GatedContent
-            unitPriceList={unitPriceListRaw}
+          <>
+            <GatedContentTracker projectSlug={slug} />
+            <GatedContent
+              unitPriceList={unitPriceListRaw}
             roiModel={roiModelRaw}
             investmentCommentary={investmentCommentary}
             privateQA={privateQA}
@@ -403,6 +406,7 @@ export default async function ProjectPage({ params }: Props) {
             sinkingFund={sinkingFund}
             foreignQuotaAvailable={foreignQuotaAvailable}
           />
+          </>
         ) : (
           <div className="mb-10 border border-gray-200 rounded-xl p-8 bg-cream">
             <h3 className="font-serif text-xl font-medium text-gray-900 mb-3">Sign up free to unlock</h3>

@@ -28,6 +28,11 @@ export async function GET(request: Request) {
         })
         // Fire and forget — don't block the redirect
         sendEmail({ from, to: user.email, subject, text, replyTo }).catch(console.error)
+
+        // Signal new signup to GA4 via query param (picked up client-side in layout)
+        const redirectUrl = new URL(`${origin}${next}`)
+        redirectUrl.searchParams.set('signup', '1')
+        return NextResponse.redirect(redirectUrl.toString())
       }
     }
   }
