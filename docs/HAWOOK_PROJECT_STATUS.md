@@ -1,14 +1,14 @@
 # HAWOOK — PROJECT STATUS
 
 **Version:** v1 — current state snapshot
-**Last updated:** 18 June 2026 (Phase 2A launch — first new_record proposal approved; doc updates)
+**Last updated:** 18 June 2026 (Polish Session 1 COMPLETE — all 14 tasks shipped)
 **Purpose:** If this chat is lost or a new conversation starts, this document brings any AI assistant (or human) up to current state in 5 minutes of reading.
 
 ---
 
 ## ONE-LINE STATUS
 
-**Tier 2 Phase 1 COMPLETE — all 14 tasks built and code-verified.** Tier 1 and all 5 Phase 1 sessions done. One external blocker: Resend DNS verification (Yogi). All email routes and triggers wired; email delivery confirms once DNS propagates. Phase 2 (Yogi's Claude + Supabase MCP) is next. Full smoke test results in `docs/HAWOOK_PHASE1_SMOKE_TEST_RESULTS.md`.
+**Tier 2 Phase 1 COMPLETE + Polish Session 1 COMPLETE.** All platform foundations and polish tasks shipped. One external blocker: Resend DNS verification (Yogi). Favicon PNGs (Task 14) need external image generation. Phase 2 (Yogi's Claude + Supabase MCP) is next. Phase 2A first new_record proposal approved: The Title Cielo Rawai (18 June 2026).
 
 ---
 
@@ -205,9 +205,32 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 
 **TIER 2 PHASE 1 IS COMPLETE.** All 14 tasks built, code-verified, deployed. Smoke test results: `docs/HAWOOK_PHASE1_SMOKE_TEST_RESULTS.md`.
 
+**POLISH SESSION 1 IS COMPLETE.** All 14 polish tasks shipped (18 June 2026). See below.
+
 ---
 
 ## WORK AFTER TIER 2 PHASE 1
+
+### Polish Session 1 — Critical fixes + SEO + compliance (DONE)
+
+| Task | Outcome |
+|---|---|
+| Task 1.1 — /about page | ✅ `app/about/page.tsx` — full editorial content from HAWOOK_ABOUT_PAGE_V1.md. Static, MarkdownContent rendered, canonical + OG metadata. |
+| Task 1.2 — /areas/rawai-nai-harn page | ✅ `app/areas/rawai-nai-harn/page.tsx` — editorial content + live project grid (Rawai + Nai Harn, Active status) + WhatsApp CTA with contextual pre-fill. Map deferred to Polish Session 4. |
+| Task 2 — Footer | ✅ 4-column footer with FooterWrapper (hidden on /admin/*). |
+| Task 3 — Cookie consent | ✅ Consent Mode v2 banner with Accept/Analytics only/Reject. |
+| Task 4 — 404 page | ✅ Custom not-found.tsx. |
+| Task 5 — Nav area link fix | ✅ /areas → /areas/rawai-nai-harn. |
+| Task 6 — Homepage metadata + auth CTA | ✅ Canonical, OG, JSON-LD. Logged-in → "Go to dashboard", logged-out → "Get free access". |
+| Task 7 — Lead form GDPR fix | ✅ subscribeNewsletter defaults false; auth pre-fill for name + email. |
+| Task 8 — Project detail SEO | ✅ generateMetadata with canonical, OG; RealEstateListing + Breadcrumb + FAQ JSON-LD schemas. |
+| Task 9.1 — /privacy page | ✅ `app/privacy/page.tsx` — PDPA-compliant draft from HAWOOK_PRIVACY_POLICY_V1.md. Substitutions applied. Draft disclaimer in italic box. |
+| Task 9.2 — /terms page | ✅ `app/terms/page.tsx` — 16-section ToS from HAWOOK_TERMS_OF_SERVICE_V1.md. Substitutions applied. Draft disclaimer in italic box. |
+| Task 10 — Sitemap | ✅ Static pages + project URLs, `as const` fix. |
+| Task 11 — ROI model empty card fix | ✅ Filters null/empty items before rendering. |
+| Task 12 — WhatsApp pre-fill on project pages | ✅ Contextual message with project name. |
+| Task 13 — Developer awards list rendering | ✅ Semicolon-split → `<ul>` when multiple items. |
+| Task 14 — Favicon PNGs | ⏳ Blocked — image files need external generation. |
 
 ### Tier 2 Phase 2 — Content Ops + Yogi's Claude (brief not yet written)
 Yogi's Claude Desktop + Supabase MCP setup. Voice & Knowledge Base injected into his session. Proposes structured updates from raw inputs (developer WhatsApp, PDFs, blog articles) via the approval queue built in Session 4.
