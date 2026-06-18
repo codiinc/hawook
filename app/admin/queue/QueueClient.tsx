@@ -5,6 +5,20 @@ import Link from 'next/link'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+interface StagedImage { file: File; previewUrl: string }
+interface StagedDoc   { file: File; documentType: string; isGated: boolean }
+
+const DOC_TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'sales_presentation',  label: 'Sales Presentation' },
+  { value: 'brochure',            label: 'Brochure' },
+  { value: 'price_list',          label: 'Price List' },
+  { value: 'payment_plan',        label: 'Payment Plan' },
+  { value: 'foreign_quota_letter', label: 'Foreign Quota Letter' },
+  { value: 'floor_plan_set',      label: 'Floor Plan Set' },
+  { value: 'spa_template',        label: 'SPA Template' },
+  { value: 'other',               label: 'Other' },
+]
+
 type Severity   = 'minor' | 'standard' | 'major'
 type ProposalStatus = 'pending_approval' | 'approved' | 'rejected' | 'applied' | 'failed'
 type Confidence = 'high' | 'medium' | 'low'
@@ -114,6 +128,9 @@ export default function QueueClient({
   const [bulkModal, setBulkModal]         = useState(false)
   const [bulkLoading, setBulkLoading]     = useState(false)
   const [notifHold, setNotifHold]         = useState<Set<string>>(new Set())
+  const [stagedImages, setStagedImages]   = useState<Record<string, StagedImage[]>>({})
+  const [stagedDocs, setStagedDocs]       = useState<Record<string, StagedDoc[]>>({})
+  const [assetError, setAssetError]       = useState<Record<string, string | null>>({})
 
   const refetch = useCallback(async (f: Filters) => {
     const params = new URLSearchParams()
@@ -138,8 +155,73 @@ export default function QueueClient({
   const removeFromList = (id: string) =>
     setProposals(ps => ps.filter(p => p.id !== id))
 
+  async function uploadAssetsForProposal(proposalId: string, projectId: string, slug: string) {
+    const images = stagedImages[proposalId] ?? []
+    const docs   = stagedDocs[proposalId] ?? []
+
+    // Upload images → Cloudinary, then patch project cover/gallery fields
+    const imageUrls: string[] = []
+    for (const img of images) {
+      const fd = new FormData()
+      fd.append('file', img.file)
+      fd.append('folder', `hawook/projects/${slug}`)
+      const res = await fetch('/api/cloudinary/upload', { method: 'POST', body: fd })
+      const json = await res.json() as { secure_url?: string; error?: string }
+      if (!res.ok) throw new Error(json.error ?? 'Image upload failed')
+      imageUrls.push(json.secure_url!)
+    }
+
+    if (imageUrls.length > 0) {
+      const [cover, ...gallery] = imageUrls
+      const fields: Record<string, unknown> = {
+        cover_image_url:  cover,
+        cover_image_type: 'cloudinary',
+      }
+      if (gallery.length > 0) {
+        fields.gallery_urls  = gallery
+        fields.gallery_types = gallery.map(() => 'cloudinary')
+      }
+      const patchRes = await fetch(`/api/admin/projects/${slug}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields }),
+      })
+      if (!patchRes.ok) throw new Error('Failed to save image URLs to project')
+    }
+
+    // Upload each document → Cloudinary (raw), then create project_documents row
+    for (const doc of docs) {
+      const fd = new FormData()
+      fd.append('file', doc.file)
+      fd.append('folder', `hawook/projects/${slug}/documents`)
+      fd.append('resource_type', 'raw')
+      const uploadRes = await fetch('/api/cloudinary/upload', { method: 'POST', body: fd })
+      const uploadJson = await uploadRes.json() as { secure_url?: string; public_id?: string; error?: string }
+      if (!uploadRes.ok) throw new Error(uploadJson.error ?? 'Document upload failed')
+
+      const docRes = await fetch('/api/admin/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id:           projectId,
+          document_type:        doc.documentType,
+          cloudinary_url:       uploadJson.secure_url,
+          cloudinary_public_id: uploadJson.public_id,
+          filename:             doc.file.name,
+          file_size_bytes:      doc.file.size,
+          is_gated:             doc.isGated,
+        }),
+      })
+      if (!docRes.ok) {
+        const docJson = await docRes.json() as { error?: string }
+        throw new Error(docJson.error ?? 'Failed to create document record')
+      }
+    }
+  }
+
   const handleApprove = async (id: string, hold = false) => {
     setLoading(id)
+    setAssetError(e => ({ ...e, [id]: null }))
     const isEditing = editMode.has(id)
     const body: Record<string, unknown> = {
       review_notes:      reviewNotes[id] ?? null,
@@ -153,8 +235,26 @@ export default function QueueClient({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
-    const json = await res.json() as { ok?: boolean; error?: string }
-    if (res.ok) {
+    const json = await res.json() as { ok?: boolean; error?: string; targetId?: string }
+    if (res.ok && json.ok) {
+      // Upload any staged assets now that the project row exists
+      const hasImages = (stagedImages[id] ?? []).length > 0
+      const hasDocs   = (stagedDocs[id] ?? []).length > 0
+      if (json.targetId && (hasImages || hasDocs)) {
+        const proposal = proposals.find(p => p.id === id)
+        if (proposal?.target_slug) {
+          try {
+            await uploadAssetsForProposal(id, json.targetId, proposal.target_slug)
+          } catch (err) {
+            setAssetError(e => ({
+              ...e,
+              [id]: err instanceof Error ? err.message : 'Asset upload failed',
+            }))
+            setLoading(null)
+            return  // Project row created; keep proposal visible so error is actionable
+          }
+        }
+      }
       removeFromList(id)
       setExpanded(null)
     } else {
@@ -532,6 +632,109 @@ export default function QueueClient({
                     className="w-full border border-gray-200 rounded px-3 py-2 text-sm"
                   />
                 </div>
+
+                {/* Project assets — only for new_record proposals targeting projects */}
+                {p.update_type === 'new_record' && p.target_table === 'projects' && canApprove && (
+                  <div className="border border-gray-200 rounded-lg p-4 space-y-4 bg-gray-50">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Project assets (optional)</p>
+
+                    {/* Upload area A: images */}
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-2">
+                        Cover + gallery images — first image becomes cover
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={e => {
+                          const files = Array.from(e.target.files ?? [])
+                          setStagedImages(si => ({
+                            ...si,
+                            [p.id]: files.map(f => ({ file: f, previewUrl: URL.createObjectURL(f) })),
+                          }))
+                        }}
+                        className="text-xs text-gray-600"
+                      />
+                      {(stagedImages[p.id] ?? []).length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {stagedImages[p.id].map((img, i) => (
+                            <div key={i} className="relative">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={img.previewUrl} alt="" className="h-16 w-16 object-cover rounded border border-gray-200" />
+                              {i === 0 && (
+                                <span className="absolute bottom-0 left-0 right-0 text-center text-[10px] bg-teal text-white rounded-b">Cover</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Upload area B: documents */}
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-2">Project documents</label>
+                      <input
+                        type="file"
+                        multiple
+                        onChange={e => {
+                          const files = Array.from(e.target.files ?? [])
+                          setStagedDocs(sd => ({
+                            ...sd,
+                            [p.id]: files.map(f => ({
+                              file: f,
+                              documentType: DOC_TYPE_OPTIONS[0].value,
+                              isGated: true,
+                            })),
+                          }))
+                        }}
+                        className="text-xs text-gray-600"
+                      />
+                      {(stagedDocs[p.id] ?? []).length > 0 && (
+                        <div className="mt-2 space-y-2">
+                          {stagedDocs[p.id].map((doc, i) => (
+                            <div key={i} className="flex items-center gap-3 text-xs bg-white border border-gray-200 rounded px-2 py-1.5">
+                              <span className="flex-1 truncate text-gray-700">{doc.file.name}</span>
+                              <select
+                                value={doc.documentType}
+                                onChange={e => setStagedDocs(sd => ({
+                                  ...sd,
+                                  [p.id]: sd[p.id].map((d, j) =>
+                                    j === i ? { ...d, documentType: e.target.value } : d
+                                  ),
+                                }))}
+                                className="border border-gray-200 rounded px-1 py-0.5 text-xs"
+                              >
+                                {DOC_TYPE_OPTIONS.map(o => (
+                                  <option key={o.value} value={o.value}>{o.label}</option>
+                                ))}
+                              </select>
+                              <label className="flex items-center gap-1 text-gray-500">
+                                <input
+                                  type="checkbox"
+                                  checked={doc.isGated}
+                                  onChange={e => setStagedDocs(sd => ({
+                                    ...sd,
+                                    [p.id]: sd[p.id].map((d, j) =>
+                                      j === i ? { ...d, isGated: e.target.checked } : d
+                                    ),
+                                  }))}
+                                />
+                                Gated
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {assetError[p.id] && (
+                      <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1">
+                        Asset upload error: {assetError[p.id]}
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 {/* Action buttons */}
                 {canApprove ? (
