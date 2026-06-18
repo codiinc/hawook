@@ -40,8 +40,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: row.seo_title ?? row.project_name,
     description: row.seo_description ?? undefined,
+    alternates: { canonical: `https://app.hawook.com/projects/${slug}` },
     openGraph: {
+      title: (row.seo_title ?? row.project_name) ?? undefined,
+      description: row.seo_description ?? undefined,
+      url: `https://app.hawook.com/projects/${slug}`,
+      siteName: 'Hawook',
       images: row.cover_image_url ? [row.cover_image_url] : [],
+      type: 'website',
     },
   }
 }
@@ -174,8 +180,7 @@ export default async function ProjectPage({ params }: Props) {
     { label: 'Ownership', value: ownershipType },
   ].filter((f) => f.value)
 
-  // Schema.org structured data
-  const schema = {
+  const listingSchema = {
     '@context': 'https://schema.org',
     '@type': 'RealEstateListing',
     name: projectName,
@@ -189,12 +194,44 @@ export default async function ProjectPage({ params }: Props) {
     },
   }
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://app.hawook.com' },
+      { '@type': 'ListItem', position: 2, name: 'Projects', item: 'https://app.hawook.com/projects' },
+      { '@type': 'ListItem', position: 3, name: projectName, item: `https://app.hawook.com/projects/${slug}` },
+    ],
+  }
+
+  const faqSchema = publicQA.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: publicQA.map(qa => ({
+      '@type': 'Question',
+      name: qa.question,
+      acceptedAnswer: { '@type': 'Answer', text: qa.answer },
+    })),
+  } : null
+
+  const waMsg = encodeURIComponent(`Hi Yogi, I’d like to know more about ${projectName}.`)
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(listingSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
 
       <article className="max-w-4xl mx-auto px-4 sm:px-6 pb-24">
         {/* Header */}
@@ -411,9 +448,21 @@ export default async function ProjectPage({ params }: Props) {
             {developerTrackRecord && (
               <p className="text-gray-600 leading-relaxed mb-3">{developerTrackRecord}</p>
             )}
-            {developerAwards && (
-              <p className="text-sm text-gray-500 italic">{developerAwards}</p>
-            )}
+            {developerAwards && (() => {
+              const items = developerAwards.split(';').map(s => s.trim()).filter(Boolean)
+              return items.length > 1 ? (
+                <ul className="space-y-1 mt-2">
+                  {items.map((award, i) => (
+                    <li key={i} className="text-sm text-gray-500 flex gap-2">
+                      <span className="text-teal shrink-0">—</span>
+                      <span className="italic">{award}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-gray-500 italic">{developerAwards}</p>
+              )
+            })()}
           </div>
         )}
 
@@ -550,14 +599,19 @@ export default async function ProjectPage({ params }: Props) {
 
         {/* Lead capture form */}
         <div className="mb-10">
-          <LeadForm projectSlug={slug} projectName={projectName} />
+          <LeadForm
+            projectSlug={slug}
+            projectName={projectName}
+            initialEmail={user?.email}
+            initialName={(user?.user_metadata?.full_name as string | undefined) ?? undefined}
+          />
         </div>
 
         {/* Follow + WhatsApp */}
         <div className="border-t border-gray-100 pt-8">
           <div className="flex flex-col sm:flex-row gap-3">
             <a
-              href="https://wa.me/66805100129"
+              href={`https://wa.me/66805100129?text=${waMsg}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-[#25D366] text-white font-medium px-6 py-3 rounded-md hover:opacity-90 transition-opacity"
@@ -585,7 +639,11 @@ function GatedContent({ unitPriceList: upl, roiModel: rm, investmentCommentary, 
   foreignQuotaAvailable: boolean | null
 }) {
   const unitPriceList = Array.isArray(upl) ? (upl as Record<string, unknown>[]) : null
-  const roiModel = Array.isArray(rm) ? (rm as Record<string, unknown>[]) : null
+  const roiModelRaw = Array.isArray(rm) ? (rm as Record<string, unknown>[]) : null
+  const roiModel = roiModelRaw?.filter(item =>
+    [item.purchase_price, item.price, item.gross_yield, item.net_yield, item.annual_net_income, item.net_income]
+      .some(v => v != null && v !== '')
+  ) ?? null
 
   return (
     <div className="mb-10 space-y-10">

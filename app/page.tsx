@@ -1,19 +1,59 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import ProjectCard from '@/components/ProjectCard'
 import type { Project } from '@/lib/types'
 
+export const metadata: Metadata = {
+  title: 'Hawook — Phuket Property, Honestly Reviewed',
+  description: 'Browse off-plan developments in Phuket with independent pricing, ROI analysis, and area guides — no sales spin.',
+  alternates: { canonical: 'https://app.hawook.com' },
+  openGraph: {
+    title: 'Hawook — Phuket Property, Honestly Reviewed',
+    description: 'Browse off-plan developments in Phuket with independent pricing, ROI analysis, and area guides — no sales spin.',
+    url: 'https://app.hawook.com',
+    siteName: 'Hawook',
+    type: 'website',
+  },
+}
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Hawook',
+  url: 'https://app.hawook.com',
+  description: 'Independent Phuket property consultancy providing honest, data-driven reviews of off-plan developments in Phuket, Thailand.',
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: '+66-80-510-0129',
+    contactType: 'customer service',
+    availableLanguage: 'English',
+  },
+  areaServed: {
+    '@type': 'Place',
+    name: 'Phuket, Thailand',
+  },
+}
+
 export default async function HomePage() {
   const supabase = await createClient()
-  const { data: projects } = await supabase
-    .from('projects_public')
-    .select('id, project_name, slug, area, price_min, construction_status, cover_image_url, hawook_intro, hawook_badge, status')
-    .eq('status', 'Active')
-    .order('created_at', { ascending: false })
-    .limit(6)
+  const [{ data: projects }, { data: { user } }] = await Promise.all([
+    supabase
+      .from('projects_public')
+      .select('id, project_name, slug, area, price_min, construction_status, cover_image_url, hawook_intro, hawook_badge, status')
+      .eq('status', 'Active')
+      .order('created_at', { ascending: false })
+      .limit(6),
+    supabase.auth.getUser(),
+  ])
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+      />
+
       {/* Hero */}
       <section className="relative bg-cream overflow-hidden">
         <div
@@ -38,12 +78,21 @@ export default async function HomePage() {
               >
                 Browse projects
               </Link>
-              <Link
-                href="/signup"
-                className="inline-flex items-center justify-center border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-md hover:border-gray-400 hover:text-gray-900 transition-colors bg-white"
-              >
-                Get free access
-              </Link>
+              {user ? (
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center justify-center border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-md hover:border-gray-400 hover:text-gray-900 transition-colors bg-white"
+                >
+                  Go to dashboard
+                </Link>
+              ) : (
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-md hover:border-gray-400 hover:text-gray-900 transition-colors bg-white"
+                >
+                  Get free access
+                </Link>
+              )}
             </div>
           </div>
         </div>

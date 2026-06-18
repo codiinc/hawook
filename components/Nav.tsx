@@ -49,7 +49,7 @@ export default function Nav() {
               Projects
             </Link>
             <Link
-              href="/areas"
+              href="/areas/rawai-nai-harn"
               className="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors"
             >
               Areas
@@ -115,7 +115,7 @@ export default function Nav() {
             <Link href="/projects" className="block text-sm font-medium text-gray-700 py-1" onClick={() => setMenuOpen(false)}>
               Projects
             </Link>
-            <Link href="/areas" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
+            <Link href="/areas/rawai-nai-harn" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
               Areas
             </Link>
             <Link href="/about" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>

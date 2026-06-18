@@ -47,6 +47,8 @@ const PERSONA_OPTIONS: { label: string; value: string }[] = [
 type Props = {
   projectSlug: string
   projectName: string
+  initialName?: string
+  initialEmail?: string
 }
 
 type FormState = {
@@ -65,17 +67,17 @@ type FormState = {
 
 type FieldError = Partial<Record<keyof FormState, string>>
 
-export default function LeadForm({ projectSlug, projectName }: Props) {
+export default function LeadForm({ projectSlug, projectName, initialName, initialEmail }: Props) {
   const [form, setForm] = useState<FormState>({
-    name: '',
-    email: '',
+    name: initialName ?? '',
+    email: initialEmail ?? '',
     countryCode: '+66',
     whatsappNumber: '',
     budget: '',
     timeframe: '',
     persona: '',
     message: '',
-    subscribeNewsletter: true,
+    subscribeNewsletter: false,
     agreeContact: false,
     honeypot: '',
   })
