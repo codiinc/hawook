@@ -261,6 +261,8 @@ Items flagged during execution, deferred not forgotten:
 
 7. **Markdown rendering uses default react-markdown styling.** Will need design-token-matched component overrides as content density grows. Currently functional.
 
+8. **Build verification must use `npm run build`, not `npx tsc --noEmit`.** Vercel runs `next build` which includes ESLint (`next/core-web-vitals` ruleset). `tsc --noEmit` only type-checks; it does not run ESLint. Three lint errors slipped through Sessions 3–4 because only tsc was run locally. **Before any push to main, run `npm run build` in the worktree and confirm it succeeds.** This catches unused-vars, unescaped JSX entities, and any other lint rules that Vercel will enforce.
+
 ---
 
 ## ALL SPEC DOCS IN /docs/
