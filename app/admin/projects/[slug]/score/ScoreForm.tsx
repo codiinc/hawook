@@ -41,12 +41,10 @@ const INPUT = 'text-sm border border-gray-200 rounded px-3 py-2 focus:outline-no
 export default function ScoreForm({
   slug,
   initialDims,
-  initialScore,
   isEditable,
 }: {
   slug: string
   initialDims: Record<DimKey, Dim>
-  initialScore: number | null
   isEditable: boolean
 }) {
   const [dims, setDims] = useState<Record<DimKey, Dim>>(initialDims)

@@ -523,7 +523,7 @@ export default function QueueClient({
 
                 {/* Defer tag (shown when defer intent) */}
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Defer tag (optional, e.g. "verify with developer")</label>
+                  <label className="block text-xs text-gray-500 mb-1">Defer tag (optional, e.g. &quot;verify with developer&quot;)</label>
                   <input
                     type="text"
                     placeholder="Defer reason…"

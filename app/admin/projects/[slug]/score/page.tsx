@@ -48,7 +48,7 @@ export default async function ScorePage({ params }: Props) {
 
   const { data } = await supabaseAdmin
     .from('projects')
-    .select('hawook_score, hawook_score_dimensions, hawook_badge')
+    .select('hawook_score_dimensions')
     .eq('slug', slug)
     .single()
 
@@ -56,7 +56,6 @@ export default async function ScorePage({ params }: Props) {
   const raw = data as Record<string, unknown>
 
   const dims = parseDims(raw.hawook_score_dimensions)
-  const score = raw.hawook_score != null ? Number(raw.hawook_score) : null
 
   return (
     <div>
@@ -70,7 +69,6 @@ export default async function ScorePage({ params }: Props) {
       <ScoreForm
         slug={slug}
         initialDims={dims}
-        initialScore={score}
         isEditable={userIsApprover}
       />
     </div>
