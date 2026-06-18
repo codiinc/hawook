@@ -1,7 +1,7 @@
 # HAWOOK — PROJECT STATUS
 
 **Version:** v1 — current state snapshot
-**Last updated:** 17 June 2026 (Session 5 — Phase 1 COMPLETE)
+**Last updated:** 18 June 2026 (Phase 2A launch — first new_record proposal approved; doc updates)
 **Purpose:** If this chat is lost or a new conversation starts, this document brings any AI assistant (or human) up to current state in 5 minutes of reading.
 
 ---
@@ -191,6 +191,7 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 - **Budget bracket format** = human-readable form labels ("Under 5M THB", "5–10M THB", etc.). Stored as-is in `budget_bracket`.
 - **Phone vs WhatsApp** — write WhatsApp to existing `phone` column for pragmatic v1. Split later if needed.
 - **`page_status` is the publish toggle** (`draft` / `published` / `archived`). `status` is content state (`Active` / `Coming Soon` / `Sold Out`). Two separate concerns.
+- **Content Ops prompt versioned as v1.1** — DATABASE CONSTRAINT VALUES section added after first real Phase 2A new_record proposal (The Title Cielo Rawai, 18 June 2026) surfaced three constraint mismatches (`data_confidence`, `ownership_type`, `status` all had free-text values that failed DB check constraints). `HAWOOK_CONTENT_OPS_PROMPT_V1.1.md` is now the current working prompt. v1 was not committed to the repo (existed only as a working document). Future iterations: v1.2 (additions/corrections), v2.0 (structural rework). `HAWOOK_CONTENT_OPS_SPEC.md` bumped to v1.1 with the same constraint values section added as section 6.
 
 ---
 
@@ -270,7 +271,8 @@ Items flagged during execution, deferred not forgotten:
 - `HAWOOK_MASTER_DOC_v1.2.md` — orientation, business model, principles, tech stack
 - `HAWOOK_VOICE_KNOWLEDGE_BASE.md` — tone, glossary, common Q&A, area knowledge, honesty boundaries
 - `HAWOOK_LEAD_PLAYBOOK_v1.2.md` — 11 stages, qualifying, cadence, message frameworks
-- `HAWOOK_CONTENT_OPS_SPEC.md` — Yogi's Claude + MCP + approval workflow
+- `HAWOOK_CONTENT_OPS_SPEC.md` — Yogi's Claude + MCP + approval workflow (v1.1 — section 6 added: DB constraint values)
+- `HAWOOK_CONTENT_OPS_PROMPT_V1.1.md` — current system prompt loaded into Yogi's Claude Desktop (v1 not in repo)
 - `HAWOOK_AI_CONCIERGE_SPEC.md` — public-facing chat agent spec
 - `HAWOOK_EMAIL_TEMPLATES.md` — 14 plain-text templates verbatim
 - `HAWOOK_TIER2_PHASE1_COWORK_BRIEF.md` — 14-task build brief

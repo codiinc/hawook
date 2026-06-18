@@ -1,6 +1,6 @@
 # HAWOOK — CONTENT OPS & CONCIERGE-DRIVEN ADMIN SPEC
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 16 June 2026
 **Status:** Build spec — defines what gets built and the rules it operates under
 **Owners:** Founder (architecture & approval rules), Yogi (operational owner)
@@ -16,13 +16,14 @@
 3. [Operational Patterns — Real Scenarios](#3-operational-patterns--real-scenarios)
 4. [MCP Scope — What Claude Can Read and Write](#4-mcp-scope--what-claude-can-read-and-write)
 5. [The Proposal Format](#5-the-proposal-format)
-6. [Approval Rules](#6-approval-rules)
-7. [Admin UI Surface](#7-admin-ui-surface)
-8. [Notification Flow After Approval](#8-notification-flow-after-approval)
-9. [Hallucination Defenses](#9-hallucination-defenses)
-10. [Multi-User Considerations](#10-multi-user-considerations)
-11. [Build Sequence](#11-build-sequence)
-12. [Open Questions](#12-open-questions)
+6. [Database Constraint Values](#6-database-constraint-values)
+7. [Approval Rules](#7-approval-rules)
+8. [Admin UI Surface](#8-admin-ui-surface)
+9. [Notification Flow After Approval](#9-notification-flow-after-approval)
+10. [Hallucination Defenses](#10-hallucination-defenses)
+11. [Multi-User Considerations](#11-multi-user-considerations)
+12. [Build Sequence](#12-build-sequence)
+13. [Open Questions](#13-open-questions)
 
 ---
 
@@ -282,7 +283,89 @@ CREATE INDEX idx_proposals_severity ON update_proposals(severity);
 
 ---
 
-## 6. APPROVAL RULES
+## 6. DATABASE CONSTRAINT VALUES
+
+Several columns have check constraints. When proposing values for these fields, use **only** the allowed values listed below. Do not invent descriptive variants or paraphrase — the database will reject them and the proposal will fail at approval time.
+
+This was confirmed in production: the first new_record proposal (The Title Cielo Rawai, June 2026) failed with three constraint violations because AI extraction produced free-text values not in the allowed sets. The constraints below are enforced by the database; they are not suggestions.
+
+### 6.1 projects.status
+
+Allowed: `'Active'` | `'Sold out'` | `'Coming soon'` | `'On hold'`
+
+| Value | Meaning |
+|---|---|
+| Active | Project is currently selling — includes pre-sale and under-construction phases where units are available |
+| Sold out | All units sold, or foreign quota exhausted for foreign-buyer-focused projects |
+| Coming soon | Announced but not yet selling |
+| On hold | Paused or delayed indefinitely |
+
+Do **not** use: `'pre-sale'`, `'under construction'`, `'launching'`, or any other variant.
+
+### 6.2 projects.page_status
+
+Allowed: `'draft'` | `'published'` | `'archived'`
+
+| Value | Meaning |
+|---|---|
+| draft | Not visible on the public site (default for new projects) |
+| published | Live on the public site |
+| archived | Removed from public site but retained in the database |
+
+For all `new_record` proposals: **always set `page_status='draft'`.** Publishing is a human approver decision after images, score, and Hawook's Take are in place.
+
+### 6.3 projects.ownership_type
+
+Allowed: `'Freehold'` | `'Leasehold'` | `'Thai quota only'` | `'Mixed'` | `'Both'`
+
+| Value | Meaning |
+|---|---|
+| Freehold | Only freehold units available (rare in Thailand for foreign buyers) |
+| Leasehold | Only leasehold structures available (typically 30+30+30 years) |
+| Thai quota only | Only the 51% Thai-owned quota; foreign buyers cannot access freehold |
+| Mixed | Combination of ownership options (e.g. freehold + leasehold + Thai quota all available) |
+| Both | Project offers **both** freehold (within foreign quota) **and** leasehold options |
+
+Do **not** use: descriptive strings like `'Thai Freehold / Leasehold / Foreign Freehold'` or `'foreign quota 49%'`.
+
+### 6.4 projects.data_confidence
+
+Allowed: `'Complete'` | `'Flagged'` | `'Incomplete'`
+
+| Value | Meaning |
+|---|---|
+| Complete | All critical fields populated with high or medium confidence from source material |
+| Flagged | Critical fields present but at least one has `discrepancy_flag=true` |
+| Incomplete | Critical fields missing, or developer confirmation pending |
+
+For `new_record` proposals: use `'Incomplete'` if any of `price_max`, `foreign_quota_units_remaining`, `payment_plan`, `completion_date` are not yet developer-confirmed. Use `'Complete'` only when everything is confirmed.
+
+Do **not** use: free-text like `'medium — core facts provided'` or `'high confidence'`.
+
+### 6.5 buyer_qa visibility field
+
+Allowed: `'public'` | `'private'`
+
+| Value | Meaning |
+|---|---|
+| public | Shown to all visitors (logged-out and logged-in) |
+| private | Shown only to authenticated users (the gated Q&A section) |
+
+Default to `public` for general questions; `private` for pricing-specific or transaction-stage questions.
+
+### 6.6 Validation rule
+
+Before submitting any proposal, verify:
+
+- All `status` / `page_status` / `ownership_type` / `data_confidence` values exactly match the allowed lists above (case-sensitive).
+- If source material describes something that doesn't map cleanly, choose the closest valid value and note the imprecision in the field's `evidence` string.
+- If no valid value fits, **stop and ask** before proposing.
+
+Constraint violations cause the entire proposal approval to fail at the database layer. There is no partial-success path — the whole transaction rolls back.
+
+---
+
+## 7. APPROVAL RULES
 
 ### 6.1 Who approves
 
@@ -334,7 +417,7 @@ Proposals not reviewed within their SLA escalate visibly in the queue (badge or 
 
 ---
 
-## 7. ADMIN UI SURFACE
+## 8. ADMIN UI SURFACE
 
 The lightweight admin UI extends what's already built. New surfaces in **bold**.
 
@@ -389,7 +472,7 @@ Initially minimal: list of approver emails. Future: toggle auto-approval per cat
 
 ---
 
-## 8. NOTIFICATION FLOW AFTER APPROVAL
+## 9. NOTIFICATION FLOW AFTER APPROVAL
 
 When a proposal is approved and the data change is applied, the system triggers user notifications based on severity and user stage. This is governed by the cadence rules locked in the Lead Playbook + recent decisions.
 
@@ -435,7 +518,7 @@ For each follower of the project:
 
 ---
 
-## 9. HALLUCINATION DEFENSES
+## 10. HALLUCINATION DEFENSES
 
 The biggest risk in the workflow is Claude proposing a confident-looking update based on misread or fabricated information. Six defenses.
 
@@ -467,7 +550,7 @@ Once a month, Codi or Yogi reviews 10 random applied proposals against their sou
 
 ---
 
-## 10. MULTI-USER CONSIDERATIONS
+## 11. MULTI-USER CONSIDERATIONS
 
 The system is designed for Yogi as the primary operator, but should not depend on him.
 
@@ -501,7 +584,7 @@ When a partner agent comes on board, they may submit content updates too (e.g., 
 
 ---
 
-## 11. BUILD SEQUENCE
+## 12. BUILD SEQUENCE
 
 The spec is large. The build is staged.
 
@@ -551,7 +634,7 @@ Refinements:
 
 ---
 
-## 12. OPEN QUESTIONS
+## 13. OPEN QUESTIONS
 
 Decisions still needed before Phase 1 build starts:
 
@@ -569,6 +652,6 @@ These five answers will inform the Phase 1 Cowork brief.
 
 ---
 
-**End of Content Ops & Concierge-Driven Admin Spec v1.0.**
+**End of Content Ops & Concierge-Driven Admin Spec v1.1.**
 
 *Founder approves any deviation from this spec during build. Build briefs reference this document by section number. Changes to the spec require explicit version bump and changelog entry.*
