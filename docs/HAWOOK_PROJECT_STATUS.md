@@ -1,7 +1,7 @@
 # HAWOOK — PROJECT STATUS
 
 **Version:** v1 — current state snapshot
-**Last updated:** 18 June 2026 (Polish Session 1 COMPLETE — all 14 tasks shipped)
+**Last updated:** 20 June 2026 (pending area page build work captured)
 **Purpose:** If this chat is lost or a new conversation starts, this document brings any AI assistant (or human) up to current state in 5 minutes of reading.
 
 ---
@@ -231,6 +231,17 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 | Task 12 — WhatsApp pre-fill on project pages | ✅ Contextual message with project name. |
 | Task 13 — Developer awards list rendering | ✅ Semicolon-split → `<ul>` when multiple items. |
 | Task 14 — Favicon PNGs | ⏳ Blocked — image files need external generation. |
+
+### Pending small build work — area pages (~1-2 hours)
+
+Ready to build when next session starts. Content docs are committed in `/docs/`.
+
+| Task | Detail | Source doc |
+|---|---|---|
+| Build `/areas/bang-tao` | Same pattern as `/areas/rawai-nai-harn`: editorial content + project grid (area='Bang Tao', status=Active) + WhatsApp CTA. Map and sub-area links deferred to Polish Session 4. | `docs/HAWOOK_AREA_PAGE_BANG_TAO_V1.md` |
+| Build `/areas` index page | Card-based index with Rawai & Nai Harn and Bang Tao cards. Live project count per area from `projects_public`. WhatsApp CTA at bottom. Hard-code areas for v1; no `areas` table needed yet. | `docs/HAWOOK_AREAS_INDEX_PAGE_V1.md` |
+| Update Nav "Areas" link | Currently points to `/areas/rawai-nai-harn`. Update to `/areas` (the index). Both desktop and mobile menu in `components/Nav.tsx`. | — |
+| Hero images for area cards | Source 2 representative photos: Nai Harn Beach (for Rawai & Nai Harn card) and a Bang Tao/Laguna beach shot (for Bang Tao card). Brand asset task — upload to Cloudinary and wire into the index page. | — |
 
 ### Tier 2 Phase 2 — Content Ops + Yogi's Claude (brief not yet written)
 Yogi's Claude Desktop + Supabase MCP setup. Voice & Knowledge Base injected into his session. Proposes structured updates from raw inputs (developer WhatsApp, PDFs, blog articles) via the approval queue built in Session 4.
