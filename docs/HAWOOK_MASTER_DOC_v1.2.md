@@ -346,6 +346,10 @@ Score = (D1 × 0.25) + (D2 × 0.20) + (D3 × 0.15) + (D4 × 0.15) + (D5 × 0.15)
 
 **Soft floor:** any project scoring below 5 on Developer Track Record (Dimension 1) is not listed regardless of overall score. We do not vouch for unproven developers.
 
+#### Listability Floor
+
+**Soft listing floor: 7.5 weighted total.** Projects scoring below 7.5 require explicit approver override to be listed in the public catalog, with a documented reason recorded in the project's internal notes. Below the floor, the default is non-listing. Per-dimension hard floors remain unchanged: Ownership & Legal must be ≥ 6.0 and Developer Track Record must be ≥ 5.0 for a project to be listable at all, regardless of weighted total.
+
 ### 2.6 Public-Facing Badge Tiers
 
 Three tiers, all positive recognition. The absence of a badge is not a negative signal — it just means the project is listed.
@@ -478,6 +482,7 @@ Sections to be added to this master doc as they're decided. Each gets its own do
 |---|---|---|
 | 1.0 | 16 June 2026 | Initial version — project overview, Hawook Score system, scoring workflow |
 | 1.2 | 17 June 2026 | `hawook_take` vs `hawook_verdict` naming clarified — `hawook_take` is the prose paragraph (Hawook's Take), `hawook_verdict` is the structured BUY IF | SKIP IF | WATCH FOR cards. Clarifying note added to Section 2.8. |
+| 1.2 | 21 June 2026 | Added 7.5 soft listing floor for Hawook Score weighted total (Section 2.5 — Listability Floor). Below 7.5 requires explicit approver override with documented reason. Per-dimension hard floors unchanged. |
 
 ---
 

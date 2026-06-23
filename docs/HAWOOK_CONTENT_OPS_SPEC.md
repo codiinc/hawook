@@ -1,6 +1,6 @@
 # HAWOOK — CONTENT OPS & CONCIERGE-DRIVEN ADMIN SPEC
 
-**Version:** 1.1
+**Version:** 1.2
 **Date:** 16 June 2026
 **Status:** Build spec — defines what gets built and the rules it operates under
 **Owners:** Founder (architecture & approval rules), Yogi (operational owner)
@@ -17,13 +17,14 @@
 4. [MCP Scope — What Claude Can Read and Write](#4-mcp-scope--what-claude-can-read-and-write)
 5. [The Proposal Format](#5-the-proposal-format)
 6. [Database Constraint Values](#6-database-constraint-values)
-7. [Approval Rules](#7-approval-rules)
-8. [Admin UI Surface](#8-admin-ui-surface)
-9. [Notification Flow After Approval](#9-notification-flow-after-approval)
-10. [Hallucination Defenses](#10-hallucination-defenses)
-11. [Multi-User Considerations](#11-multi-user-considerations)
-12. [Build Sequence](#12-build-sequence)
-13. [Open Questions](#13-open-questions)
+7. [Two-Stage Workflow](#7-two-stage-workflow)
+8. [Approval Rules](#8-approval-rules)
+9. [Admin UI Surface](#9-admin-ui-surface)
+10. [Notification Flow After Approval](#10-notification-flow-after-approval)
+11. [Hallucination Defenses](#11-hallucination-defenses)
+12. [Multi-User Considerations](#12-multi-user-considerations)
+13. [Build Sequence](#13-build-sequence)
+14. [Open Questions](#14-open-questions)
 
 ---
 
@@ -353,27 +354,108 @@ Allowed: `'public'` | `'private'`
 
 Default to `public` for general questions; `private` for pricing-specific or transaction-stage questions.
 
-### 6.6 Validation rule
+### 6.6 projects.hawook_badge
+
+Allowed: `'recommended'` | `'top_pick'` | `NULL`
+
+| Value | Meaning |
+|---|---|
+| `'recommended'` | Project meets the Hawook bar — displays the "Hawook Recommended" badge publicly |
+| `'top_pick'` | Best-in-class within its area and price tier — displays "Hawook Top Pick" badge publicly |
+| `NULL` | Project is listed on Hawook without a featured badge ("Hawook Listed" in internal language, but this is **not** a public-facing label or badge value) |
+
+**Score-to-badge thresholds:**
+
+| Hawook Score | Badge |
+|---|---|
+| ≥ 9.0 | `'top_pick'` |
+| 8.0 – 8.99 | `'recommended'` |
+| < 8.0 | `NULL` |
+
+**Stage 2 gating:** `hawook_badge` must **never** be proposed in Stage 1 (data extraction). It is only proposed as part of a Stage 2 scoring walkthrough — as a `field_update` proposal with `severity='major'` — after the Hawook Score has been finalized in conversation with the user. See Section 7 (Two-Stage Workflow).
+
+Do **not** use: `'listed'`, `'hawook_listed'`, `'none'`, `'standard'`, `'featured'`, or any other variant. Three states only: `'recommended'`, `'top_pick'`, `NULL`.
+
+### 6.7 Fields you must never propose
+
+The following fields must never appear in a proposal's `fields_changed` array under any circumstances.
+
+| Field | Why reserved |
+|---|---|
+| `hawook_score` | Set only after explicit score walkthrough in Stage 2 |
+| `hawook_score_dimensions` | Set only after explicit score walkthrough in Stage 2 |
+| `hawook_badge` | Derived from score; Stage 2 only — see 6.6 |
+| `last_updated` | Managed automatically by the application on every write |
+| `created_at` | Set at row creation; immutable |
+| `updated_at` | Managed automatically by the application on every write |
+| `data_confidence` (in `field_update` proposals) | Only valid in `new_record` proposals to set initial confidence; do not propose changes to it via `field_update` — let the approver reset it manually if needed |
+
+If source material contains information that feels relevant to reserved fields (e.g. developer track record notes that would inform a score), capture it in `source_raw` and note it in `ai_session_context`. Do not propose values for reserved fields.
+
+### 6.8 Validation rule
 
 Before submitting any proposal, verify:
 
-- All `status` / `page_status` / `ownership_type` / `data_confidence` values exactly match the allowed lists above (case-sensitive).
+- All `status` / `page_status` / `ownership_type` / `data_confidence` / `hawook_badge` values exactly match the allowed lists above (case-sensitive).
 - If source material describes something that doesn't map cleanly, choose the closest valid value and note the imprecision in the field's `evidence` string.
 - If no valid value fits, **stop and ask** before proposing.
+- None of the fields in 6.7 are included in a Stage 1 proposal.
 
 Constraint violations cause the entire proposal approval to fail at the database layer. There is no partial-success path — the whole transaction rolls back.
 
 ---
 
-## 7. APPROVAL RULES
+## 7. TWO-STAGE WORKFLOW
 
-### 6.1 Who approves
+Processing a new project from raw source material is a two-stage operation. The stages are always sequential — Stage 2 never begins until Stage 1 is approved and applied.
+
+### 7.1 Stage 1 — Data extraction
+
+**What it covers:** All structured factual data derivable from source material.
+
+Typical fields: `project_name`, `slug`, `area`, `developer_name`, `status`, `page_status`, `ownership_type`, `data_confidence`, `price_min`, `price_max`, `price_per_sqm_min`, `price_per_sqm_max`, `total_units`, `foreign_quota_units_total`, `foreign_quota_units_remaining`, `unit_types`, `unit_sizes`, `completion_date`, `completion_quarter`, `construction_status`, `payment_plan`, `cam_fee_thb_sqm`, `sinking_fund_thb_sqm`, `foreign_quota_available`, `rental_program_available`, `nearby_landmarks`, `location_description`, `facilities`, `unique_features`, `buyer_qa`, `description_public`.
+
+**What it never covers:** `hawook_score`, `hawook_score_dimensions`, `hawook_badge`, `last_updated`, `created_at`, `updated_at` (see Section 6.7). `data_confidence` is valid in `new_record` proposals only.
+
+**Output:** One `new_record` proposal (for a brand-new project) or one or more `field_update` proposals (for an existing project). Severity is typically `standard` for data population; `major` if price, quota, or status fields change significantly.
+
+**After Stage 1 is approved:** The project row exists in the database with factual data populated. It is in `page_status='draft'` and has no badge or editorial content. It is not visible to the public.
+
+### 7.2 Stage 2 — Scoring and editorial
+
+**What it covers:** The Hawook Score walkthrough and all editorial fields.
+
+This stage is a structured conversation between Claude and the user (Codi or designated approver). Claude does not propose a score unilaterally. Instead:
+
+1. Claude reads the Stage 1-applied project row via MCP.
+2. Claude walks through each of the six Hawook Score dimensions with the user, proposing sub-scores with evidence from source material and site knowledge.
+3. User agrees or adjusts each sub-score. Total score is calculated.
+4. Score determines badge tier (see Section 6.6).
+5. Claude drafts `hawook_take`, `hawook_verdict`, and `hawook_intro` for user review (these may be proposed in a separate `field_update` or applied via direct admin edit — they are not gated to Stage 2 like the score fields, but benefit from being drafted after the score is clear).
+6. User reviews and approves the editorial drafts.
+7. Claude submits a `field_update` proposal with `severity='major'` covering: `hawook_score`, `hawook_score_dimensions`, `hawook_badge`. Editorial fields (`hawook_take`, `hawook_verdict`, `hawook_intro`) may be included in the same proposal or submitted separately.
+8. Approver reviews and applies in the queue.
+
+**After Stage 2 is approved:** The project has a score, badge, and editorial content. It is ready for image review and final publishing decision.
+
+### 7.3 Why the split
+
+Mixing data extraction and editorial scoring in a single proposal creates two risks:
+
+1. **Hallucinated editorial content.** Score, badge, and editorial fields require judgment that shouldn't come from the same source-material extraction pass as factual fields. They need a deliberate conversation, not an automated derivation.
+2. **Approval coupling.** If factual data and a score are in one proposal, the approver can't apply the data fix without also accepting a score they may not have reviewed carefully. The two-stage split keeps approvals clean.
+
+---
+
+## 8. APPROVAL RULES
+
+### 8.1 Who approves
 
 For v1.0: only Founder. The admin email whitelist in `lib/admin.ts` defines admin access; approval rights are restricted to a subset of that whitelist (defined in a new `lib/approvers.ts` — for now, just Codi's email).
 
 For v1.5+: senior team members can be granted approval rights for `minor` and `standard` severity. `major` always requires Founder.
 
-### 6.2 What auto-approves
+### 8.2 What auto-approves
 
 **Nothing in v1.0.** Every proposal goes to the queue. As we build confidence, the following may graduate to auto-approval (toggled per category in admin settings):
 
@@ -383,7 +465,7 @@ For v1.5+: senior team members can be granted approval rights for `minor` and `s
 
 Hawook Score changes and price changes never auto-approve, period.
 
-### 6.3 Severity rules
+### 8.3 Severity rules
 
 The severity field controls notification behavior and approval urgency:
 
@@ -395,7 +477,7 @@ The severity field controls notification behavior and approval urgency:
 
 Claude proposes the severity; Codi can adjust during review. The severity assigned at approval time is what governs notification flow.
 
-### 6.4 Review actions
+### 8.4 Review actions
 
 For each proposal in the queue, the approver can:
 
@@ -407,7 +489,7 @@ For each proposal in the queue, the approver can:
 
 Bulk actions: approve all minor proposals at once (if reviewer is confident).
 
-### 6.5 Time-to-review SLA
+### 8.5 Time-to-review SLA
 
 - Major proposals: target review within 4 hours during Phuket business hours, 24 hours outer bound. Email pings on creation, escalating ping after 4 hours.
 - Standard proposals: 48 hours.
@@ -417,7 +499,7 @@ Proposals not reviewed within their SLA escalate visibly in the queue (badge or 
 
 ---
 
-## 8. ADMIN UI SURFACE
+## 9. ADMIN UI SURFACE
 
 The lightweight admin UI extends what's already built. New surfaces in **bold**.
 
@@ -472,7 +554,7 @@ Initially minimal: list of approver emails. Future: toggle auto-approval per cat
 
 ---
 
-## 9. NOTIFICATION FLOW AFTER APPROVAL
+## 10. NOTIFICATION FLOW AFTER APPROVAL
 
 When a proposal is approved and the data change is applied, the system triggers user notifications based on severity and user stage. This is governed by the cadence rules locked in the Lead Playbook + recent decisions.
 
@@ -518,7 +600,7 @@ For each follower of the project:
 
 ---
 
-## 10. HALLUCINATION DEFENSES
+## 11. HALLUCINATION DEFENSES
 
 The biggest risk in the workflow is Claude proposing a confident-looking update based on misread or fabricated information. Six defenses.
 
@@ -550,7 +632,7 @@ Once a month, Codi or Yogi reviews 10 random applied proposals against their sou
 
 ---
 
-## 11. MULTI-USER CONSIDERATIONS
+## 12. MULTI-USER CONSIDERATIONS
 
 The system is designed for Yogi as the primary operator, but should not depend on him.
 
@@ -584,7 +666,7 @@ When a partner agent comes on board, they may submit content updates too (e.g., 
 
 ---
 
-## 12. BUILD SEQUENCE
+## 13. BUILD SEQUENCE
 
 The spec is large. The build is staged.
 
@@ -634,7 +716,7 @@ Refinements:
 
 ---
 
-## 13. OPEN QUESTIONS
+## 14. OPEN QUESTIONS
 
 Decisions still needed before Phase 1 build starts:
 
@@ -652,6 +734,6 @@ These five answers will inform the Phase 1 Cowork brief.
 
 ---
 
-**End of Content Ops & Concierge-Driven Admin Spec v1.1.**
+**End of Content Ops & Concierge-Driven Admin Spec v1.2.**
 
 *Founder approves any deviation from this spec during build. Build briefs reference this document by section number. Changes to the spec require explicit version bump and changelog entry.*

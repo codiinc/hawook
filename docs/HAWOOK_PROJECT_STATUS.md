@@ -1,7 +1,7 @@
 # HAWOOK — PROJECT STATUS
 
 **Version:** v1 — current state snapshot
-**Last updated:** 20 June 2026 (pending area page build work captured)
+**Last updated:** 23 June 2026 (Agent Referral Program brief committed — held for activation ~2-3 weeks)
 **Purpose:** If this chat is lost or a new conversation starts, this document brings any AI assistant (or human) up to current state in 5 minutes of reading.
 
 ---
@@ -192,6 +192,9 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 - **Phone vs WhatsApp** — write WhatsApp to existing `phone` column for pragmatic v1. Split later if needed.
 - **`page_status` is the publish toggle** (`draft` / `published` / `archived`). `status` is content state (`Active` / `Coming Soon` / `Sold Out`). Two separate concerns.
 - **Content Ops prompt versioned as v1.1** — DATABASE CONSTRAINT VALUES section added after first real Phase 2A new_record proposal (The Title Cielo Rawai, 18 June 2026) surfaced three constraint mismatches (`data_confidence`, `ownership_type`, `status` all had free-text values that failed DB check constraints). `HAWOOK_CONTENT_OPS_PROMPT_V1.1.md` is now the current working prompt. v1 was not committed to the repo (existed only as a working document). Future iterations: v1.2 (additions/corrections), v2.0 (structural rework). `HAWOOK_CONTENT_OPS_SPEC.md` bumped to v1.1 with the same constraint values section added as section 6.
+- **Content Ops prompt versioned as v1.2** — Two-stage workflow added (Stage 1: data extraction only → Stage 2: scoring walkthrough + editorial). Stage 1 never proposes `hawook_score`, `hawook_score_dimensions`, or `hawook_badge`. Stage 2 proposes these as a single `major`-severity `field_update` after score is finalized in conversation with the user. Surfaced by Rhea badge constraint issue (June 2026). `HAWOOK_CONTENT_OPS_PROMPT_V1.2.md` is the current working prompt; v1 and v1.1 retained as historical record. Spec bumped to v1.2 with section 7 (Two-Stage Workflow) and updated section 6 (badge tokens, never-propose fields).
+- **Hawook badge value tokens locked** — `'recommended'` (Hawook Recommended badge), `'top_pick'` (Hawook Top Pick badge), `NULL` (no badge — project listed without featured status). Internal language "Hawook Listed" refers to the NULL state but is **not** a public-facing label and must never be used as a column value. Three states only. Score thresholds: ≥9.0 → `top_pick`, 8.0–8.99 → `recommended`, <8.0 → `NULL`.
+- **Listability floor locked: 7.5 weighted total** as soft floor. Projects below 7.5 require explicit approver override with documented reason; default is non-listing. Per-dimension hard floors unchanged: Ownership & Legal ≥ 6.0 and Developer Track Record ≥ 5.0 required regardless of weighted total. Documented in `HAWOOK_MASTER_DOC_v1.2.md` Section 2.5.
 
 ---
 
@@ -242,6 +245,14 @@ Ready to build when next session starts. Content docs are committed in `/docs/`.
 | Build `/areas` index page | Card-based index with Rawai & Nai Harn and Bang Tao cards. Live project count per area from `projects_public`. WhatsApp CTA at bottom. Hard-code areas for v1; no `areas` table needed yet. | `docs/HAWOOK_AREAS_INDEX_PAGE_V1.md` |
 | Update Nav "Areas" link | Currently points to `/areas/rawai-nai-harn`. Update to `/areas` (the index). Both desktop and mobile menu in `components/Nav.tsx`. | — |
 | Hero images for area cards | Source 2 representative photos: Nai Harn Beach (for Rawai & Nai Harn card) and a Bang Tao/Laguna beach shot (for Bang Tao card). Brand asset task — upload to Cloudinary and wire into the index page. | — |
+
+### Agent Referral Program — Strategic backlog
+
+Brief held in `docs/HAWOOK_AGENT_REFERRAL_PROGRAM_BRIEF.md`. Not active. Invitation-only; Codi initiates all outreach.
+
+**Activation target: ~2-3 weeks (mid-July 2026)** — after catalog reaches 8+ published projects and Polish Session 2 ships.
+
+Pre-activation (now): Codi compiles research list of 5-10 priority partners (no outreach yet). Infrastructure build (~6-8 hrs, Vlad) opens in Weeks 3-4. First partner outreach in Week 5. Commission: 20% → 22% → 25% tiered, capped at 25%. Net 30 USD via bank transfer or Wise.
 
 ### Tier 2 Phase 2 — Content Ops + Yogi's Claude (brief not yet written)
 Yogi's Claude Desktop + Supabase MCP setup. Voice & Knowledge Base injected into his session. Proposes structured updates from raw inputs (developer WhatsApp, PDFs, blog articles) via the approval queue built in Session 4.
@@ -305,9 +316,12 @@ Items flagged during execution, deferred not forgotten:
 - `HAWOOK_MASTER_DOC_v1.2.md` — orientation, business model, principles, tech stack
 - `HAWOOK_VOICE_KNOWLEDGE_BASE.md` — tone, glossary, common Q&A, area knowledge, honesty boundaries
 - `HAWOOK_LEAD_PLAYBOOK_v1.2.md` — 11 stages, qualifying, cadence, message frameworks
-- `HAWOOK_CONTENT_OPS_SPEC.md` — Yogi's Claude + MCP + approval workflow (v1.1 — section 6 added: DB constraint values)
-- `HAWOOK_CONTENT_OPS_PROMPT_V1.1.md` — current system prompt loaded into Yogi's Claude Desktop (v1 not in repo)
+- `HAWOOK_CONTENT_OPS_SPEC.md` — Yogi's Claude + MCP + approval workflow (v1.2 — sections 6–7: DB constraints, two-stage workflow, badge tokens, never-propose fields)
+- `HAWOOK_CONTENT_OPS_PROMPT_V1.2.md` — **current** system prompt for Yogi's Claude Desktop
+- `HAWOOK_CONTENT_OPS_PROMPT_V1.1.md` — historical (v1.1 — DB constraint values added)
+- `HAWOOK_CONTENT_OPS_PROMPT_V1.md` — historical baseline (retroactively committed)
 - `HAWOOK_AI_CONCIERGE_SPEC.md` — public-facing chat agent spec
+- `HAWOOK_AGENT_REFERRAL_PROGRAM_BRIEF.md` — invitation-only agent referral strategy; held for activation ~2-3 weeks after catalog reaches 8+ published projects and Polish Session 2 ships
 - `HAWOOK_EMAIL_TEMPLATES.md` — 14 plain-text templates verbatim
 - `HAWOOK_TIER2_PHASE1_COWORK_BRIEF.md` — 14-task build brief
 - `HAWOOK_PROJECT_STATUS.md` — this file
