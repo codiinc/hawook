@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 
@@ -47,11 +48,14 @@ export default async function AreasPage() {
 
         {/* Rawai & Nai Harn card */}
         <div className="border border-gray-200 rounded-xl overflow-hidden flex flex-col">
-          {/* Hero image placeholder — brand asset needed: Nai Harn Beach or Promthep Cape photo */}
-          <div className="h-56 bg-teal/10 flex items-center justify-center">
-            <span className="text-teal/40 text-sm font-medium tracking-wide uppercase">
-              Rawai &amp; Nai Harn — hero photo needed
-            </span>
+          <div className="relative h-56 overflow-hidden">
+            <Image
+              src="https://res.cloudinary.com/dq5a1hiut/image/upload/v1782223609/hawook/areas/rawai-nai-harn-hero.jpg"
+              alt="Sunset over Rawai pier, southern Phuket"
+              fill
+              className="object-cover"
+              sizes="(min-width: 1024px) 50vw, 100vw"
+            />
           </div>
           <div className="p-8 flex flex-col flex-1">
             <h2 className="font-serif text-3xl font-medium text-gray-900 mb-1">Rawai &amp; Nai Harn</h2>
@@ -86,11 +90,14 @@ export default async function AreasPage() {
 
         {/* Bang Tao card */}
         <div className="border border-gray-200 rounded-xl overflow-hidden flex flex-col">
-          {/* Hero image placeholder — brand asset needed: Laguna or Layan beach shot */}
-          <div className="h-56 bg-teal/10 flex items-center justify-center">
-            <span className="text-teal/40 text-sm font-medium tracking-wide uppercase">
-              Bang Tao — hero photo needed
-            </span>
+          <div className="relative h-56 overflow-hidden">
+            <Image
+              src="https://res.cloudinary.com/dq5a1hiut/image/upload/v1782223601/hawook/areas/bang-tao-hero.jpg"
+              alt="Beach club at sunset, Bang Tao, Phuket"
+              fill
+              className="object-cover"
+              sizes="(min-width: 1024px) 50vw, 100vw"
+            />
           </div>
           <div className="p-8 flex flex-col flex-1">
             <h2 className="font-serif text-3xl font-medium text-gray-900 mb-1">Bang Tao</h2>
