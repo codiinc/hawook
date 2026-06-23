@@ -1,7 +1,7 @@
 # HAWOOK — PROJECT STATUS
 
 **Version:** v1 — current state snapshot
-**Last updated:** 23 June 2026 (Agent Referral Program brief committed — held for activation ~2-3 weeks)
+**Last updated:** 23 June 2026 (Bang Tao area page + /areas index page live; Nav updated to /areas)
 **Purpose:** If this chat is lost or a new conversation starts, this document brings any AI assistant (or human) up to current state in 5 minutes of reading.
 
 ---
@@ -235,16 +235,14 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 | Task 13 — Developer awards list rendering | ✅ Semicolon-split → `<ul>` when multiple items. |
 | Task 14 — Favicon PNGs | ⏳ Blocked — image files need external generation. |
 
-### Pending small build work — area pages (~1-2 hours)
+### Area pages — DONE (23 June 2026)
 
-Ready to build when next session starts. Content docs are committed in `/docs/`.
-
-| Task | Detail | Source doc |
-|---|---|---|
-| Build `/areas/bang-tao` | Same pattern as `/areas/rawai-nai-harn`: editorial content + project grid (area='Bang Tao', status=Active) + WhatsApp CTA. Map and sub-area links deferred to Polish Session 4. | `docs/HAWOOK_AREA_PAGE_BANG_TAO_V1.md` |
-| Build `/areas` index page | Card-based index with Rawai & Nai Harn and Bang Tao cards. Live project count per area from `projects_public`. WhatsApp CTA at bottom. Hard-code areas for v1; no `areas` table needed yet. | `docs/HAWOOK_AREAS_INDEX_PAGE_V1.md` |
-| Update Nav "Areas" link | Currently points to `/areas/rawai-nai-harn`. Update to `/areas` (the index). Both desktop and mobile menu in `components/Nav.tsx`. | — |
-| Hero images for area cards | Source 2 representative photos: Nai Harn Beach (for Rawai & Nai Harn card) and a Bang Tao/Laguna beach shot (for Bang Tao card). Brand asset task — upload to Cloudinary and wire into the index page. | — |
+| Task | Outcome |
+|---|---|
+| Build `/areas/bang-tao` | ✅ `app/areas/bang-tao/page.tsx` — editorial content from HAWOOK_AREA_PAGE_BANG_TAO_V1.md + project grid (area=Bang Tao, status=Active) + WhatsApp CTA. Map and sub-area links deferred to Polish Session 4. |
+| Build `/areas` index page | ✅ `app/areas/page.tsx` — two area cards with live project counts from `projects_public`, editorial intro, "Other areas" note, WhatsApp CTA. Hard-coded areas for v1. |
+| Update Nav "Areas" link | ✅ `components/Nav.tsx` — desktop and mobile both now point to `/areas`. |
+| Hero images for area cards | ⏳ Placeholder gradient in both cards. Needs: Nai Harn Beach photo (Rawai & Nai Harn card) and Laguna/Layan beach shot (Bang Tao card). Brand asset task — upload to Cloudinary and wire into `/areas/page.tsx`. |
 
 ### Agent Referral Program — Strategic backlog
 
