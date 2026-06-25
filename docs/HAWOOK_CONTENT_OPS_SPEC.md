@@ -403,6 +403,58 @@ Before submitting any proposal, verify:
 
 Constraint violations cause the entire proposal approval to fail at the database layer. There is no partial-success path — the whole transaction rolls back.
 
+### 6.9 Column type discipline
+
+Database columns have specific types. The `proposed_value` in every `fields_changed` entry must match the column's type exactly. Descriptive context belongs in adjacent text fields (e.g., `description_public`, `design_commentary`, `facilities`) — never embedded inside numeric, boolean, date, or enum-constrained columns.
+
+Type mismatches are the most common cause of proposal approval failures to date (Adora Rawai, June 2026: `buildings` and `floors` both failed because descriptive strings were proposed instead of integer literals).
+
+**INTEGER columns** — propose a plain integer number only. No strings, no units, no qualifiers.
+
+Confirmed INTEGER columns on `projects`:
+
+| Column | Correct | Wrong |
+|---|---|---|
+| `buildings` | `9` | `"9 (8 residential A-D and F-I + 1 facilities building E)"` |
+| `floors` | `4` | `"4 (residential blocks); 3 (Building E facilities core)"` |
+| `total_units` | `210` | `"210 units"` |
+| `foreign_quota_units_remaining` | `47` | `"approximately 47"` |
+
+If the source is ambiguous ("around 9 buildings"), propose the best-estimate integer with `ai_confidence='low'` and explain the imprecision in the `evidence` string. Put descriptive context in `design_commentary`, `description_public`, or `facilities`.
+
+**NUMERIC / DECIMAL columns** — plain numbers only. Strip currency symbols, percentage signs, and unit suffixes.
+
+| Correct | Wrong |
+|---|---|
+| `3990000` | `"3.99M THB"` |
+| `3.2` | `"3.2%"` |
+| `158000` | `"158k baht"` |
+
+**DATE columns** — ISO 8601 format only (`YYYY-MM-DD`). If source gives a quarter or month without a specific day, pick a reasonable convention (end of month / end of quarter) and note the imprecision in `evidence`.
+
+| Correct | Wrong |
+|---|---|
+| `"2027-11-30"` | `"Q4 2027"` |
+| `"2027-03-31"` | `"March 2027"` |
+
+**BOOLEAN columns** — unquoted JSON literals `true` or `false`. Never `"yes"`, `"no"`, or `"true"`.
+
+**ENUM / CHECK-CONSTRAINED columns** — use only the exact tokens listed in sections 6.1–6.6.
+
+**ARRAY columns** — use JSONB array syntax: `["value1", "value2"]`. Never a comma-separated string.
+
+**Pre-submission type check (mandatory):** Before inserting any proposal, walk each field in `fields_changed` and verify: integer → plain integer; numeric → plain number; date → ISO 8601; boolean → `true`/`false`; enum → allowed token; array → array syntax.
+
+When uncertain about a column's type, query before proposing:
+
+```sql
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'projects' AND column_name = '<field>';
+```
+
+30 seconds of type-checking prevents a failed proposal that requires manual intervention to fix.
+
 ---
 
 ## 7. TWO-STAGE WORKFLOW

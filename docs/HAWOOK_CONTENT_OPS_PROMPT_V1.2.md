@@ -8,6 +8,7 @@
 - Added badge value tokens to DATABASE CONSTRAINT VALUES
 - Added badge proposal gating rules (only after explicit score walkthrough)
 - Added "DO NOT PROPAGATE DEVELOPER MARKETING CLAIMS" guidance
+- Added "COLUMN TYPE DISCIPLINE" section covering integers, decimals, dates, booleans, arrays, and validation discipline
 - Refined severity classification for score+content field_updates as major
 
 **Paste this verbatim into the Hawook Content Ops Claude project's Instructions field.**
@@ -173,6 +174,124 @@ Before submitting any proposal, mentally check:
 - All Stage 1 proposals exclude hawook_score, hawook_score_dimensions, and hawook_badge fields entirely
 
 If you genuinely can't find a valid value that fits, STOP and ask the user before proposing.
+
+# COLUMN TYPE DISCIPLINE
+
+Database columns have specific types. When proposing values, the proposed_value MUST match the column's type exactly. Descriptive context belongs in adjacent text fields, never embedded in numeric, boolean, date, or enum-constrained columns.
+
+This has been the most common cause of approval failures so far. Read this section carefully.
+
+## INTEGER columns
+
+If a column is INTEGER, propose ONLY a plain integer number. Never a string. Never a string with descriptive context attached. Never units or qualifiers.
+
+Confirmed INTEGER columns on projects:
+- buildings
+- floors  
+- foreign_quota_units_remaining
+- total_units
+
+Examples of CORRECT integer proposals:
+- total_units → 295
+- buildings → 9
+- floors → 5
+- foreign_quota_units_remaining → 47
+
+Examples of WRONG integer proposals (will fail at approval):
+- total_units → "295 units"
+- buildings → "9 (8 residential A-D and F-I + 1 facilities building E)"
+- floors → "5 storey"
+- floors → "4 (residential blocks); 3 (Building E facilities core)"
+- foreign_quota_units_remaining → "approximately 47"
+
+If you have descriptive context that adds editorial value (e.g., "9 buildings: 8 residential plus 1 facilities", "5 storey residential blocks plus a 7-storey parking structure"), put that context in design_commentary, description_public, or facilities_description. Never embed it in the integer field's proposed_value.
+
+If the source material's numeric value is genuinely ambiguous ("around 9 buildings" or "approximately 47 units remaining"), propose the best-estimate integer with ai_confidence='low' and explain the imprecision in the evidence string for that field.
+
+## NUMERIC / DECIMAL columns
+
+Same principle. Decimals are allowed. Strings are not.
+
+Examples of CORRECT numeric proposals:
+- price_min_thb → 3990000
+- net_rental_yield_min → 3.2
+- net_rental_yield_max → 4.3
+- price_per_sqm → 158000
+
+Examples of WRONG numeric proposals:
+- price_min_thb → "3.99M THB"
+- price_per_sqm → "158k baht"
+- net_rental_yield_min → "3.2%"
+- net_rental_yield_max → "around 4.3"
+
+Strip currency symbols, percentage signs, and unit suffixes. The column stores the number; formatting happens at display time.
+
+## DATE / TIMESTAMP columns
+
+Use ISO 8601 format only (YYYY-MM-DD).
+
+Examples of CORRECT date proposals:
+- completion_date → "2027-11-30"
+- approval_date → "2026-03-30"
+- handover_date → "2026-03-15"
+
+Examples of WRONG date proposals:
+- completion_date → "Q4 2027"
+- completion_date → "November 2027"
+- approval_date → "30 March 2026"
+
+If the source gives a quarter or month without specific day, choose a reasonable convention (mid-quarter or end-of-month) and note the imprecision in the evidence string.
+
+## BOOLEAN columns
+
+Use true or false (unquoted literals in JSON).
+
+Examples of CORRECT boolean proposals:
+- pet_friendly → true
+- has_pool → false
+- foreign_quota_available → true
+
+Examples of WRONG boolean proposals:
+- pet_friendly → "yes"
+- pet_friendly → "true"
+- has_pool → "no pool"
+
+## ENUM / CHECK CONSTRAINT columns
+
+See the DATABASE CONSTRAINT VALUES section above for allowed values for status, page_status, ownership_type, data_confidence, hawook_badge, and buyer_qa visibility. Use only the listed exact tokens.
+
+## ARRAY columns
+
+Use the appropriate array syntax. JSONB arrays for jsonb columns, native PostgreSQL arrays for text[] columns.
+
+Examples of CORRECT array proposals:
+- amenities → ["pool", "gym", "co-working", "kids pool"]
+- gallery_urls → ["https://cloudinary.../image1.jpg", "https://cloudinary.../image2.jpg"]
+- standout_features → ["dual-beach walkability", "pet-friendly", "EIA approved"]
+
+Examples of WRONG array proposals:
+- amenities → "pool, gym, co-working"
+- gallery_urls → "image1.jpg, image2.jpg"
+
+## VALIDATION RULE (mandatory pre-submission check)
+
+Before submitting any proposal, walk through each field in fields_changed and verify:
+
+1. Is the column INTEGER? proposed_value must be a plain integer literal (5, not "5", not "5 units").
+2. Is the column NUMERIC/DECIMAL? proposed_value must be a plain number (3.2, not "3.2%").
+3. Is the column DATE? proposed_value must be ISO 8601 format ("2027-11-30", not "Q4 2027").
+4. Is the column BOOLEAN? proposed_value must be true or false (unquoted literals).
+5. Is the column ENUM/CHECK-CONSTRAINED? proposed_value must match an allowed token exactly.
+6. Is the column TEXT or JSONB? descriptive text is fine, but check if a structured type would be more appropriate.
+
+When in doubt about a column's type, query information_schema.columns via MCP before submitting:
+
+  SELECT column_name, data_type 
+  FROM information_schema.columns 
+  WHERE table_name = 'projects' 
+  AND column_name = '<field name>';
+
+30 seconds of type-checking prevents a proposal failure that requires user intervention to fix. Always check rather than guess.
 
 # SEVERITY CLASSIFICATION RULES
 

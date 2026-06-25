@@ -483,6 +483,7 @@ Sections to be added to this master doc as they're decided. Each gets its own do
 | 1.0 | 16 June 2026 | Initial version — project overview, Hawook Score system, scoring workflow |
 | 1.2 | 17 June 2026 | `hawook_take` vs `hawook_verdict` naming clarified — `hawook_take` is the prose paragraph (Hawook's Take), `hawook_verdict` is the structured BUY IF | SKIP IF | WATCH FOR cards. Clarifying note added to Section 2.8. |
 | 1.2 | 21 June 2026 | Added 7.5 soft listing floor for Hawook Score weighted total (Section 2.5 — Listability Floor). Below 7.5 requires explicit approver override with documented reason. Per-dimension hard floors unchanged. |
+| 1.2 | 25 June 2026 | Column type discipline formalised in Content Ops Spec (Section 6.9) after Adora Rawai proposal failures (buildings, floors integer type mismatches). Integer columns must use plain integer literals. Numeric columns strip currency symbols and percentage signs. Date columns use ISO 8601. |
 
 ---
 

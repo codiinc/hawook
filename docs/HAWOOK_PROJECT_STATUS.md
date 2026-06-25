@@ -1,7 +1,7 @@
 # HAWOOK — PROJECT STATUS
 
 **Version:** v1 — current state snapshot
-**Last updated:** 23 June 2026 (Bang Tao area page + /areas index page live; Nav updated to /areas)
+**Last updated:** 25 June 2026 (Content Ops v1.2 column type discipline formalised)
 **Purpose:** If this chat is lost or a new conversation starts, this document brings any AI assistant (or human) up to current state in 5 minutes of reading.
 
 ---
@@ -195,6 +195,7 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 - **Content Ops prompt versioned as v1.2** — Two-stage workflow added (Stage 1: data extraction only → Stage 2: scoring walkthrough + editorial). Stage 1 never proposes `hawook_score`, `hawook_score_dimensions`, or `hawook_badge`. Stage 2 proposes these as a single `major`-severity `field_update` after score is finalized in conversation with the user. Surfaced by Rhea badge constraint issue (June 2026). `HAWOOK_CONTENT_OPS_PROMPT_V1.2.md` is the current working prompt; v1 and v1.1 retained as historical record. Spec bumped to v1.2 with section 7 (Two-Stage Workflow) and updated section 6 (badge tokens, never-propose fields).
 - **Hawook badge value tokens locked** — `'recommended'` (Hawook Recommended badge), `'top_pick'` (Hawook Top Pick badge), `NULL` (no badge — project listed without featured status). Internal language "Hawook Listed" refers to the NULL state but is **not** a public-facing label and must never be used as a column value. Three states only. Score thresholds: ≥9.0 → `top_pick`, 8.0–8.99 → `recommended`, <8.0 → `NULL`.
 - **Listability floor locked: 7.5 weighted total** as soft floor. Projects below 7.5 require explicit approver override with documented reason; default is non-listing. Per-dimension hard floors unchanged: Ownership & Legal ≥ 6.0 and Developer Track Record ≥ 5.0 required regardless of weighted total. Documented in `HAWOOK_MASTER_DOC_v1.2.md` Section 2.5.
+- **Column type discipline added to Content Ops v1.2** after multiple type-mismatch proposal failures (Adora Rawai June 2026: `buildings` and `floors` both failed because descriptive strings were proposed instead of integer literals; earlier: badge tokens, ownership_type free-text). Proposed values must match column type exactly — integers as plain integers, numeric as plain numbers, dates as ISO 8601, booleans as `true`/`false` literals. Descriptive context belongs in adjacent text fields (`description_public`, `design_commentary`, `facilities`), never embedded in structured-type columns. Formalised in Content Ops Spec Section 6.9 and added to v1.2 prompt.
 
 ---
 
