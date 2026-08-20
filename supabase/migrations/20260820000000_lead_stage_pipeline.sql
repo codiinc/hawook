@@ -25,11 +25,13 @@ BEGIN
   END IF;
 END $$;
 
--- ── 1. Migrate existing data before touching the constraint ────────────────────
+-- ── 1. Drop old constraint first (required — old constraint rejects 'Inquiry') ─
+ALTER TABLE leads DROP CONSTRAINT IF EXISTS leads_lead_stage_check;
+
+-- ── 2. Migrate existing data ──────────────────────────────────────────────────
 UPDATE leads SET lead_stage = 'Inquiry' WHERE lead_stage = 'New';
 
--- ── 2. Replace check constraint ───────────────────────────────────────────────
-ALTER TABLE leads DROP CONSTRAINT IF EXISTS leads_lead_stage_check;
+-- ── 3. Add new 9-value constraint ────────────────────────────────────────────
 ALTER TABLE leads ADD CONSTRAINT leads_lead_stage_check CHECK (
   lead_stage IN (
     'Inquiry',
@@ -44,7 +46,7 @@ ALTER TABLE leads ADD CONSTRAINT leads_lead_stage_check CHECK (
   )
 );
 
--- ── 3. Stage history table ────────────────────────────────────────────────────
+-- ── 4. Stage history table ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS lead_stage_history (
   id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   lead_id         UUID        NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
@@ -58,7 +60,7 @@ CREATE TABLE IF NOT EXISTS lead_stage_history (
 CREATE INDEX IF NOT EXISTS idx_lead_stage_history_lead_time
   ON lead_stage_history (lead_id, transitioned_at DESC);
 
--- ── 4. Trigger: auto-record stage changes ─────────────────────────────────────
+-- ── 5. Trigger: auto-record stage changes ─────────────────────────────────────
 CREATE OR REPLACE FUNCTION trg_fn_lead_stage_history()
 RETURNS TRIGGER LANGUAGE plpgsql AS $$
 BEGIN
@@ -80,7 +82,7 @@ CREATE TRIGGER tg_lead_stage_history
   AFTER INSERT OR UPDATE OF lead_stage ON leads
   FOR EACH ROW EXECUTE FUNCTION trg_fn_lead_stage_history();
 
--- ── 5. Backfill: one initial entry per existing lead ─────────────────────────
+-- ── 6. Backfill: one initial entry per existing lead ─────────────────────────
 -- Uses the lead's created_at as the transition timestamp.
 -- The trigger above only fires on future INSERT/UPDATE, so no double-counting.
 INSERT INTO lead_stage_history (lead_id, from_stage, to_stage, transitioned_at, transitioned_by)
