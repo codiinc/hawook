@@ -77,7 +77,7 @@ export async function POST(request: Request) {
       persona: persona as Persona,
       message: message?.trim() || null,
       source: 'form_submission',
-      lead_stage: 'New',
+      lead_stage: 'Inquiry',
       current_project_context_id: projectId,
       subscribe_newsletter: !!subscribe_newsletter,
     })
