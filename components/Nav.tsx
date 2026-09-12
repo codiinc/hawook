@@ -55,6 +55,24 @@ export default function Nav() {
               Areas
             </Link>
             <Link
+              href="/articles"
+              className={`text-sm font-medium transition-colors ${isActive('/articles') ? 'text-teal' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+              Articles
+            </Link>
+            <Link
+              href="/profiles"
+              className={`text-sm font-medium transition-colors ${isActive('/profiles') ? 'text-teal' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+              Profiles
+            </Link>
+            <Link
+              href="/guides"
+              className={`text-sm font-medium transition-colors ${isActive('/guides') ? 'text-teal' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+              Guides
+            </Link>
+            <Link
               href="/about"
               className="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors"
             >
@@ -117,6 +135,15 @@ export default function Nav() {
             </Link>
             <Link href="/areas" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
               Areas
+            </Link>
+            <Link href="/articles" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
+              Articles
+            </Link>
+            <Link href="/profiles" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
+              Profiles
+            </Link>
+            <Link href="/guides" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
+              Guides
             </Link>
             <Link href="/about" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
               About
