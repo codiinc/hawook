@@ -37,8 +37,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="mailto:yogi@hawook.com" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  yogi@hawook.com
+                <a href="mailto:hello@hawook.com" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  hello@hawook.com
                 </a>
               </li>
             </ul>
@@ -53,13 +53,19 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <p className="text-xs text-gray-400">
-            &copy; {new Date().getFullYear()} Hawook Property Consultancy. All rights reserved.
-          </p>
-          <p className="text-xs text-gray-400">
-            Independent property research — not a licensed estate agent.
-          </p>
+        <div className="border-t border-gray-200 pt-6 space-y-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <p className="text-xs text-gray-400">
+              &copy; {new Date().getFullYear()} Hawook Property Consultancy. All rights reserved.
+            </p>
+            <p className="text-xs text-gray-400">
+              Independent property research — not a licensed estate agent.
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-400">The Chokdee Group Co., Ltd. — Trading as Hawook.</p>
+            <p className="text-xs text-gray-400">We earn commission from developers, never from buyers.</p>
+          </div>
         </div>
       </div>
     </footer>

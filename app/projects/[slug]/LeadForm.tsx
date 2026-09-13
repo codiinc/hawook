@@ -159,7 +159,7 @@ export default function LeadForm({ projectSlug, projectName, initialName, initia
     return (
       <div className="border border-teal/30 rounded-xl p-6 sm:p-8 bg-teal-light">
         <p className="font-serif text-lg font-medium text-gray-900 mb-3">
-          Thanks {firstName} — Yogi will be in touch within the next hour during Phuket business hours. Watch for an email from yogi@hawook.com.
+          Thanks {firstName} — Yogi will be in touch within the next hour during Phuket business hours. Watch for an email from hello@hawook.com.
         </p>
         <a
           href={`https://wa.me/66805100129?text=${whatsappMsg}`}
@@ -367,7 +367,8 @@ export default function LeadForm({ projectSlug, projectName, initialName, initia
         </button>
 
         <p className="text-xs text-gray-400 text-center">
-          Your details are shared with Hawook only. No spam, no third-party sharing.
+          Your details are shared with Hawook only. No spam, no third-party sharing.{' '}
+          <a href="/privacy" className="underline hover:text-gray-600 transition-colors">Privacy Policy</a>.
         </p>
       </form>
     </div>
