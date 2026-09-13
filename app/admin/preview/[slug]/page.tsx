@@ -24,7 +24,7 @@ export default async function AdminPreviewPage({ params }: Props) {
 
   const { data: article } = await supabaseAdmin
     .from('blog_articles')
-    .select('slug, title, body_mdx, article_type, published_at, tags, hero_image_url, seo_title, seo_description, seo_keywords, related_project_ids, related_area_slugs, status')
+    .select('slug, title, body_mdx, article_type, published_at, last_updated, tags, hero_image_url, seo_title, seo_description, seo_keywords, related_project_ids, related_area_slugs, status')
     .eq('slug', slug)
     .single()
 

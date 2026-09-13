@@ -3,8 +3,18 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import ArticleCard from '@/components/ArticleCard'
 
 export const metadata: Metadata = {
-  title: 'Articles | Hawook',
+  title: 'Articles',
   description: 'Property insights, buying guides, and expert analysis for Phuket real estate.',
+  alternates: { canonical: 'https://app.hawook.com/articles' },
+  openGraph: {
+    title: 'Articles',
+    description: 'Property insights, buying guides, and expert analysis for Phuket real estate.',
+    url: 'https://app.hawook.com/articles',
+    siteName: 'Hawook',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: { card: 'summary_large_image', title: 'Articles' },
 }
 
 export default async function ArticlesPage() {

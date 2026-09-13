@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { isApprover } from '@/lib/approvers'
 import QueueClient from './QueueClient'
 
-export const metadata = { title: 'Queue — Admin | Hawook' }
+export const metadata = { title: 'Queue — Admin' }
 
 export default async function QueuePage() {
   const supabase = await createClient()

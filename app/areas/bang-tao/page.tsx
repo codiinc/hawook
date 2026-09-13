@@ -6,11 +6,11 @@ import ProjectCard from '@/components/ProjectCard'
 import type { Project } from '@/lib/types'
 
 export const metadata: Metadata = {
-  title: 'Bang Tao Property Guide | Hawook',
+  title: 'Bang Tao Property Guide',
   description: 'Bang Tao is Phuket\'s premium resort and beachfront residence area — a 6-kilometre stretch of Andaman Sea coast anchored by Laguna Phuket.',
   alternates: { canonical: 'https://app.hawook.com/areas/bang-tao' },
   openGraph: {
-    title: 'Bang Tao Property Guide | Hawook',
+    title: 'Bang Tao Property Guide',
     description: 'Bang Tao is Phuket\'s premium resort and beachfront residence area — a 6-kilometre stretch of Andaman Sea coast anchored by Laguna Phuket.',
     url: 'https://app.hawook.com/areas/bang-tao',
   },

@@ -5,33 +5,21 @@ import ProjectCard from '@/components/ProjectCard'
 import type { Project } from '@/lib/types'
 
 export const metadata: Metadata = {
-  title: 'Hawook — Phuket Property, Honestly Reviewed',
+  title: { absolute: 'Hawook — Curated off-plan property in Phuket' },
   description: 'Browse off-plan developments in Phuket with independent pricing, ROI analysis, and area guides — no sales spin.',
   alternates: { canonical: 'https://app.hawook.com' },
   openGraph: {
-    title: 'Hawook — Phuket Property, Honestly Reviewed',
+    title: 'Hawook — Curated off-plan property in Phuket',
     description: 'Browse off-plan developments in Phuket with independent pricing, ROI analysis, and area guides — no sales spin.',
     url: 'https://app.hawook.com',
     siteName: 'Hawook',
     type: 'website',
+    locale: 'en_US',
   },
-}
-
-const orgSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Hawook',
-  url: 'https://app.hawook.com',
-  description: 'Independent Phuket property consultancy providing honest, data-driven reviews of off-plan developments in Phuket, Thailand.',
-  contactPoint: {
-    '@type': 'ContactPoint',
-    telephone: '+66-80-510-0129',
-    contactType: 'customer service',
-    availableLanguage: 'English',
-  },
-  areaServed: {
-    '@type': 'Place',
-    name: 'Phuket, Thailand',
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Hawook — Curated off-plan property in Phuket',
+    description: 'Browse off-plan developments in Phuket with independent pricing, ROI analysis, and area guides — no sales spin.',
   },
 }
 
@@ -49,11 +37,6 @@ export default async function HomePage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
-      />
-
       {/* Hero */}
       <section className="relative bg-cream overflow-hidden">
         <div

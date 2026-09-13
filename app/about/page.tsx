@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import MarkdownContent from '@/components/MarkdownContent'
 
 export const metadata: Metadata = {
-  title: 'About Hawook',
+  title: 'About',
   description: 'Independent Phuket property research. No agents. No commissions. No spin. We review freehold developments and tell you what we think.',
   alternates: { canonical: 'https://app.hawook.com/about' },
   openGraph: {

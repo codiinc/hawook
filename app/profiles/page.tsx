@@ -4,8 +4,18 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import ArticleCard from '@/components/ArticleCard'
 
 export const metadata: Metadata = {
-  title: 'Developer & Company Profiles | Hawook',
+  title: 'Developer & Company Profiles',
   description: 'Profiles of Phuket property developers and construction companies.',
+  alternates: { canonical: 'https://app.hawook.com/profiles' },
+  openGraph: {
+    title: 'Developer & Company Profiles',
+    description: 'Profiles of Phuket property developers and construction companies.',
+    url: 'https://app.hawook.com/profiles',
+    siteName: 'Hawook',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: { card: 'summary_large_image', title: 'Developer & Company Profiles' },
 }
 
 const FILTER_OPTIONS = [

@@ -1,7 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import LeadsClient from './LeadsClient'
 
-export const metadata = { title: 'Leads — Admin | Hawook' }
+export const metadata = { title: 'Leads — Admin' }
 
 export default async function LeadsPage() {
   const { data } = await supabaseAdmin

@@ -4,8 +4,18 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import ArticleCard from '@/components/ArticleCard'
 
 export const metadata: Metadata = {
-  title: 'Guides | Hawook',
+  title: 'Guides',
   description: 'Area guides and buyer guides for Phuket property.',
+  alternates: { canonical: 'https://app.hawook.com/guides' },
+  openGraph: {
+    title: 'Guides',
+    description: 'Area guides and buyer guides for Phuket property.',
+    url: 'https://app.hawook.com/guides',
+    siteName: 'Hawook',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: { card: 'summary_large_image', title: 'Guides' },
 }
 
 const FILTER_OPTIONS = [

@@ -1,7 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import AuditClient from './AuditClient'
 
-export const metadata = { title: 'Audit Log — Admin | Hawook' }
+export const metadata = { title: 'Audit Log — Admin' }
 
 export default async function AuditPage() {
   const { data, count } = await supabaseAdmin

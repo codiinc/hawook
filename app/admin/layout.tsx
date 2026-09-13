@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { isAdmin } from '@/lib/admin'
 
-export const metadata = { title: 'Admin — Hawook' }
+export const metadata = { title: 'Admin' }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()

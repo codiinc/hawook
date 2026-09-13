@@ -4,11 +4,11 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = {
-  title: 'Phuket Property Areas | Hawook',
+  title: 'Phuket Property Areas',
   description: 'Where to look in Phuket — Hawook\'s curated coverage of Rawai & Nai Harn and Bang Tao.',
   alternates: { canonical: 'https://app.hawook.com/areas' },
   openGraph: {
-    title: 'Phuket Property Areas | Hawook',
+    title: 'Phuket Property Areas',
     description: 'Where to look in Phuket — Hawook\'s curated coverage of Rawai & Nai Harn and Bang Tao.',
     url: 'https://app.hawook.com/areas',
   },

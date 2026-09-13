@@ -4,6 +4,8 @@ import MarkdownContent from '@/components/MarkdownContent'
 import ProjectCard from '@/components/ProjectCard'
 import type { Project } from '@/lib/types'
 
+const BLUR_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjY3NSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2U1ZTdlYiIvPjwvc3ZnPg=='
+
 const TYPE_LABELS: Record<string, string> = {
   article:            'Article',
   company_profile:    'Company Profile',
@@ -18,6 +20,7 @@ export interface ArticleRendererData {
   body_mdx: string | null
   article_type: string
   published_at: string | null
+  last_updated?: string | null
   tags: string[] | null
   hero_image_url: string | null
   seo_title: string | null
@@ -47,6 +50,12 @@ export default function ArticleRenderer({ article, relatedProjects, isDraftPrevi
   const typeLabel = TYPE_LABELS[article.article_type] ?? article.article_type
   const relatedAreas = (article.related_area_slugs ?? []).filter(Boolean)
 
+  const showLastUpdated = (() => {
+    if (!article.last_updated || !article.published_at) return false
+    const diff = new Date(article.last_updated).getTime() - new Date(article.published_at).getTime()
+    return diff > 30 * 24 * 60 * 60 * 1000
+  })()
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
       {isDraftPreview && (
@@ -66,6 +75,11 @@ export default function ArticleRenderer({ article, relatedProjects, isDraftPrevi
               <span className="text-sm text-gray-400">{fmtDate(article.published_at)}</span>
             )}
             <span className="text-sm text-gray-400">{mins} min read</span>
+            {showLastUpdated && article.last_updated && (
+              <span className="text-sm text-gray-400">
+                Last updated: {fmtDate(article.last_updated)}
+              </span>
+            )}
           </div>
           <h1 className="font-serif text-3xl sm:text-4xl font-medium text-gray-900 leading-tight mb-4">
             {article.title}
@@ -92,6 +106,8 @@ export default function ArticleRenderer({ article, relatedProjects, isDraftPrevi
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 672px"
               priority
+              placeholder="blur"
+              blurDataURL={BLUR_PLACEHOLDER}
             />
           </div>
         )}
