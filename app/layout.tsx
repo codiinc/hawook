@@ -13,6 +13,33 @@ export const metadata: Metadata = {
   },
   description: 'Browse off-plan developments in Phuket with independent pricing, ROI analysis, and area guides — no sales spin.',
   metadataBase: new URL('https://app.hawook.com'),
+  openGraph: {
+    siteName: 'Hawook',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@hawook',
+  },
+}
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Hawook',
+  legalName: 'The Chokdee Group Co., Ltd.',
+  url: 'https://app.hawook.com',
+  email: 'hello@hawook.com',
+  description: 'Independent Phuket property consultancy providing honest, data-driven reviews of off-plan developments in Phuket, Thailand.',
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: '+66-80-510-0129',
+    email: 'hello@hawook.com',
+    contactType: 'customer service',
+    availableLanguage: 'English',
+  },
+  areaServed: { '@type': 'Place', name: 'Phuket, Thailand' },
 }
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
@@ -50,6 +77,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Script>
           </>
         )}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
         <AnalyticsEvents />
         <Nav />
         <main>{children}</main>
