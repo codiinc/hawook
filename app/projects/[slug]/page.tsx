@@ -46,8 +46,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: row.seo_description ?? undefined,
       url: `https://app.hawook.com/projects/${slug}`,
       siteName: 'Hawook',
-      images: row.cover_image_url ? [row.cover_image_url] : [],
+      images: row.cover_image_url ? [{ url: row.cover_image_url.replace('/upload/', '/upload/c_fill,g_auto,w_1200,h_630,f_jpg,q_auto/'), width: 1200, height: 630 }] : [],
       type: 'website',
+      locale: 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: (row.seo_title ?? row.project_name) ?? undefined,
+      description: row.seo_description ?? undefined,
+      images: row.cover_image_url ? [row.cover_image_url.replace('/upload/', '/upload/c_fill,g_auto,w_1200,h_630,f_jpg,q_auto/')] : [],
     },
   }
 }
@@ -108,6 +115,7 @@ export default async function ProjectPage({ params }: Props) {
 
   const id = s('id') ?? ''
   const projectName = s('project_name') ?? ''
+  const lastUpdatedRaw = s('last_updated')
   const area = s('area')
   const developerName = s('developer_name')
   const constructionStatus = s('construction_status')
@@ -255,6 +263,12 @@ export default async function ProjectPage({ params }: Props) {
             <p className="text-gray-500 mb-3">by {developerName}</p>
           )}
           {hawookBadge && <HawookBadge badge={hawookBadge} />}
+          {lastUpdatedRaw && (
+            <p className="text-xs text-gray-400 mt-2">
+              Data last refreshed:{' '}
+              {new Date(lastUpdatedRaw).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+          )}
         </div>
 
         {/* Cover image */}
@@ -267,6 +281,8 @@ export default async function ProjectPage({ params }: Props) {
               height={675}
               className="w-full h-full object-cover"
               priority
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjY3NSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2U1ZTdlYiIvPjwvc3ZnPg=="
             />
           </div>
         )}

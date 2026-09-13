@@ -4,6 +4,8 @@ import { formatPriceFrom } from '@/lib/format'
 import type { Project } from '@/lib/types'
 import HawookBadge from '@/components/HawookBadge'
 
+const BLUR_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTVlN2ViIi8+PC9zdmc+'
+
 type Props = {
   project: Project
 }
@@ -22,6 +24,8 @@ export default function ProjectCard({ project }: Props) {
             fill
             className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            placeholder="blur"
+            blurDataURL={BLUR_PLACEHOLDER}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

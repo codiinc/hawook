@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 
+const BLUR_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNDUwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTVlN2ViIi8+PC9zdmc+'
+
 const TYPE_LABELS: Record<string, string> = {
   article:            'Article',
   company_profile:    'Company Profile',
@@ -47,6 +49,8 @@ export default function ArticleCard({ article, href, showTypeBadge = false }: Pr
             fill
             className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            placeholder="blur"
+            blurDataURL={BLUR_PLACEHOLDER}
           />
         </div>
       )}
