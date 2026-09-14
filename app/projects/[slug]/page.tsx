@@ -10,6 +10,7 @@ import GatedContentTracker from './GatedContentTracker'
 import LeadForm from './LeadForm'
 import MarkdownContent from '@/components/MarkdownContent'
 import { ScoreDisplay } from '@/components/ds/ScoreDisplay'
+import { ScoreBreakdown, SCORE_DIMENSIONS } from '@/components/ds/ScoreBreakdown'
 import { Callout } from '@/components/ds/Callout'
 import { SectionHeader } from '@/components/ds/SectionHeader'
 import { DataList } from '@/components/ds/DataList'
@@ -330,6 +331,24 @@ export default async function ProjectPage({ params }: Props) {
           </div>
         )}
 
+        {/* ── How the score is built ── */}
+        {hawookScore != null && (
+          <section style={{ marginBottom: 'var(--space-10)' }}>
+            <SectionHeader
+              title="How the score is built"
+              note={user
+                ? 'Six weighted dimensions. Hover the strip in the header for the same detail in miniature.'
+                : 'Six weighted dimensions. The structure is public; the values are for signed-in readers.'}
+            />
+            <ScoreBreakdown dimensions={SCORE_DIMENSIONS} locked={!user} columns={2} />
+            {!user && (
+              <p style={{ marginTop: 'var(--space-6)', paddingLeft: 'var(--space-5)', borderLeft: '3px solid var(--rule-brand)', fontSize: 'var(--text-body)', color: 'var(--text-primary)' }}>
+                <Link href="/login" style={{ fontWeight: 'var(--fw-semibold)', color: 'var(--text-brand)', textDecoration: 'none' }}>Sign in</Link> to see the full scoring breakdown. It&apos;s free, and nothing here is behind a payment.
+              </p>
+            )}
+          </section>
+        )}
+
         {/* ── Hawook intro ── */}
         {hawookIntro && (
           <div style={{ marginBottom: 'var(--space-8)', maxWidth: 'var(--measure-prose)' }}>
@@ -521,17 +540,22 @@ export default async function ProjectPage({ params }: Props) {
         )}
 
         {/* ── Verdict ── */}
-        {verdict && (
-          <section style={{ marginBottom: 'var(--space-8)', display: 'grid', gap: 'var(--space-7)' }}>
-            {verdict.buyIf && (
-              <Callout kind="verdict" label="Buy if">
-                <p>{verdict.buyIf}</p>
-              </Callout>
-            )}
-            {verdict.skipIf && (
-              <Callout kind="verdict" label="Skip if">
-                <p>{verdict.skipIf}</p>
-              </Callout>
+        {verdict && (verdict.buyIf || verdict.skipIf || verdict.watchFor) && (
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <SectionHeader title="Verdict &amp; what we&apos;d flag" />
+            {(verdict.buyIf || verdict.skipIf) && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-8)', marginBottom: verdict.watchFor ? 'var(--space-8)' : 0 }}>
+                {verdict.buyIf && (
+                  <Callout kind="verdict">
+                    <p>{verdict.buyIf}</p>
+                  </Callout>
+                )}
+                {verdict.skipIf && (
+                  <Callout kind="restraint">
+                    <p>{verdict.skipIf}</p>
+                  </Callout>
+                )}
+              </div>
             )}
             {verdict.watchFor && (
               <Callout kind="flag">

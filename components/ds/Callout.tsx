@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react'
 
-type CalloutKind = 'take' | 'verdict' | 'flag'
+type CalloutKind = 'take' | 'verdict' | 'restraint' | 'flag'
 
 const KINDS: Record<CalloutKind, { label: string; rule: string; color: string }> = {
   take: { label: "Hawook's Take", rule: 'var(--rule-brand)', color: 'var(--text-brand)' },
-  verdict: { label: 'Verdict', rule: 'var(--rule-brand)', color: 'var(--text-brand)' },
+  verdict: { label: 'Buy If', rule: 'var(--rule-brand)', color: 'var(--text-brand)' },
+  restraint: { label: 'Skip If', rule: 'var(--rule)', color: 'var(--text-secondary)' },
   flag: { label: "What We'd Flag", rule: 'var(--rule-flag)', color: 'var(--text-flag)' },
 }
 
@@ -18,7 +19,7 @@ interface CalloutProps {
 
 export function Callout({ kind = 'take', label, byline, children, className }: CalloutProps) {
   const k = KINDS[kind]
-  const emphatic = kind === 'verdict'
+  const emphatic = kind === 'verdict' || kind === 'restraint'
 
   return (
     <aside
