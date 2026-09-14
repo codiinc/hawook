@@ -13,6 +13,7 @@ interface ScoreDisplayProps {
   score: number
   size?: 'sm' | 'md' | 'lg'
   locked?: boolean
+  dimensionsLocked?: boolean
   badge?: boolean
   strip?: boolean
   dimensions?: ScoreDimension[]
@@ -31,6 +32,7 @@ export function ScoreDisplay({
   score,
   size = 'sm',
   locked = false,
+  dimensionsLocked,
   badge = true,
   strip = false,
   dimensions,
@@ -40,6 +42,7 @@ export function ScoreDisplay({
 }: ScoreDisplayProps) {
   const [hover, setHover] = useState<number | null>(null)
   const showStrip = strip && dimensions && dimensions.length > 0
+  const dimLocked = dimensionsLocked ?? locked
   const isLg = size === 'lg'
 
   return (
@@ -91,7 +94,7 @@ export function ScoreDisplay({
                 onFocus={() => setHover(i)}
                 tabIndex={0}
                 role="img"
-                aria-label={`${d.label}: ${locked ? 'hidden' : d.score.toFixed(1)} out of 10, ${Math.round(d.weight * 100)}% of the score`}
+                aria-label={`${d.label}: ${dimLocked ? 'hidden' : d.score.toFixed(1)} out of 10, ${Math.round(d.weight * 100)}% of the score`}
                 style={{
                   flex: d.weight,
                   height: isLg ? 38 : 16,
@@ -110,7 +113,7 @@ export function ScoreDisplay({
                     left: 0,
                     bottom: 0,
                     width: '100%',
-                    height: locked ? 0 : `${Math.max(6, ((d.score - 6) / 4) * 100)}%`,
+                    height: dimLocked ? 0 : `${Math.max(6, ((d.score - 6) / 4) * 100)}%`,
                     background: hover === i ? 'var(--navy-700)' : 'var(--score-bar-fill)',
                     transition: `background var(--dur-fast) var(--ease-out)`,
                   }}
@@ -139,14 +142,14 @@ export function ScoreDisplay({
                   </span>
                   <span
                     className="hw-num"
-                    style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-title)', fontWeight: 'var(--fw-semibold)', color: locked ? 'var(--score-locked)' : 'var(--text-primary)' }}
+                    style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-title)', fontWeight: 'var(--fw-semibold)', color: dimLocked ? 'var(--score-locked)' : 'var(--text-primary)' }}
                   >
-                    {locked ? '—' : dimensions[hover].score.toFixed(1)}
+                    {dimLocked ? '—' : dimensions[hover].score.toFixed(1)}
                   </span>
                 </span>
                 <span style={{ display: 'block', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
                   {Math.round(dimensions[hover].weight * 100)}% of the score
-                  {locked ? '' : ` · contributes ${(dimensions[hover].score * dimensions[hover].weight).toFixed(2)}`}
+                  {dimLocked ? '' : ` · contributes ${(dimensions[hover].score * dimensions[hover].weight).toFixed(2)}`}
                 </span>
               </span>
             )}

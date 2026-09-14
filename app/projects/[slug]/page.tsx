@@ -41,13 +41,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!data) return {}
   const row = data as Record<string, string | null>
 
+  const pageTitle = row.project_name ?? undefined
+  const ogTitle = row.project_name ? `${row.project_name} | Hawook` : undefined
+  const description = row.seo_description ?? undefined
+
   return {
-    title: row.seo_title ?? row.project_name,
-    description: row.seo_description ?? undefined,
+    title: pageTitle,
+    description,
     alternates: { canonical: `https://app.hawook.com/projects/${slug}` },
     openGraph: {
-      title: (row.seo_title ?? row.project_name) ?? undefined,
-      description: row.seo_description ?? undefined,
+      title: ogTitle,
+      description,
       url: `https://app.hawook.com/projects/${slug}`,
       siteName: 'Hawook',
       images: row.cover_image_url ? [{ url: row.cover_image_url.replace('/upload/', '/upload/c_fill,g_auto,w_1200,h_630,f_jpg,q_auto/'), width: 1200, height: 630 }] : [],
@@ -56,8 +60,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: (row.seo_title ?? row.project_name) ?? undefined,
-      description: row.seo_description ?? undefined,
+      title: ogTitle,
+      description,
       images: row.cover_image_url ? [row.cover_image_url.replace('/upload/', '/upload/c_fill,g_auto,w_1200,h_630,f_jpg,q_auto/')] : [],
     },
   }
@@ -268,7 +272,21 @@ export default async function ProjectPage({ params }: Props) {
             {/* Score panel */}
             {hawookScore != null && (
               <div style={{ flexShrink: 0, padding: 'var(--space-6)', background: 'var(--bg-surface)', border: '1px solid var(--rule)', borderRadius: 'var(--radius-md)' }}>
-                <ScoreDisplay score={hawookScore} size="lg" badge strip={false} />
+                <ScoreDisplay
+                  score={hawookScore}
+                  size="lg"
+                  badge
+                  strip
+                  dimensionsLocked
+                  dimensions={[
+                    { label: 'Location', score: 0, weight: 0.20 },
+                    { label: 'Developer', score: 0, weight: 0.20 },
+                    { label: 'Design', score: 0, weight: 0.15 },
+                    { label: 'Value', score: 0, weight: 0.20 },
+                    { label: 'Financials', score: 0, weight: 0.15 },
+                    { label: 'Risk', score: 0, weight: 0.10 },
+                  ]}
+                />
               </div>
             )}
             {!hawookScore && hawookBadge && (
