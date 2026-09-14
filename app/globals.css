@@ -1,25 +1,146 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap');
+/* Hawook Design System — token imports */
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=Figtree:ital,wght@0,300..800;1,300..800&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ---- Design tokens ---- */
 :root {
-  --font-inter: 'Inter', system-ui, sans-serif;
-  --font-fraunces: 'Fraunces', Georgia, serif;
+  /* Colors */
+  --navy-950:#011C38;--navy-900:#012C57;--navy-800:#0A3A68;--navy-700:#1B4C7A;--navy-500:#4A749B;--navy-300:#9DB4C9;--navy-200:#C7D5E1;--navy-50:#EDF1F6;
+  --blue-600:#0069BE;--blue-500:#0080E3;--blue-100:#D6EBFA;
+  --brass-700:#8C6224;--brass-600:#A8762E;--brass-500:#C89F5D;--brass-200:#E8D8B8;--brass-50:#F6EEDC;
+  --terracotta-700:#96413A;--terracotta-600:#A8483C;--terracotta-500:#B85C50;--terracotta-100:#F1DFDB;
+  --sand-50:#FDFCFA;--sand-100:#FAF8F5;--sand-200:#F4F0EA;--sand-300:#EBE6DE;--sand-400:#DBD3C7;--sand-500:#B9B0A2;
+  --ink-900:#1A1D24;--ink-700:#3C4351;--ink-500:#5A6478;--ink-400:#7C8698;--white:#FFFFFF;
+
+  /* Semantic: surfaces */
+  --bg-page:var(--sand-100);--bg-surface:var(--white);--bg-tint:var(--sand-200);--bg-inverse:var(--navy-900);--bg-inverse-deep:var(--navy-950);--bg-subtle-brand:var(--navy-50);--bg-editorial:var(--brass-50);
+  /* Semantic: text */
+  --text-primary:var(--ink-900);--text-secondary:var(--ink-500);--text-tertiary:var(--ink-400);--text-brand:var(--navy-900);--text-on-inverse:var(--white);--text-on-inverse-muted:var(--navy-200);--text-link:var(--navy-900);--text-link-hover:var(--blue-600);--text-accent:var(--brass-600);--text-flag:var(--terracotta-600);
+  /* Semantic: lines */
+  --rule:var(--sand-300);--rule-strong:var(--sand-400);--rule-brand:var(--navy-900);--rule-accent:var(--brass-500);--rule-flag:var(--terracotta-500);--rule-inverse:rgba(255,255,255,.18);
+  /* Semantic: interactive */
+  --action-primary:var(--navy-900);--action-primary-hover:var(--navy-800);--action-primary-active:var(--navy-950);--action-secondary-border:var(--navy-900);--focus-ring:var(--blue-500);--disabled-bg:var(--sand-200);--disabled-text:var(--sand-500);
+  /* Semantic: score signals */
+  --score-recommended:var(--navy-900);--score-toppick:var(--brass-600);--score-toppick-fill:var(--brass-500);--score-none:var(--ink-500);--score-bar-track:var(--sand-300);--score-bar-fill:var(--navy-900);--score-locked:var(--sand-400);
+  --state-success:var(--navy-900);--state-flag:var(--terracotta-600);
+
+  /* Typography */
+  --font-display:"Source Serif 4","Iowan Old Style",Georgia,serif;
+  --font-sans:"Figtree","Helvetica Neue",Arial,sans-serif;
+  --font-body:var(--font-sans);
+  --fw-light:300;--fw-regular:400;--fw-medium:500;--fw-semibold:600;--fw-bold:700;
+  --text-display-1:4.5rem;--text-display-2:3.5rem;--text-display-3:2.5rem;--text-display-4:1.75rem;--text-title:1.375rem;
+  --lh-display-tight:1.04;--lh-display:1.14;--lh-title:1.28;
+  --text-lead:1.25rem;--text-body-lg:1.125rem;--text-body:1rem;--text-sm:0.875rem;--text-xs:0.8125rem;--text-label:0.6875rem;
+  --lh-editorial:1.72;--lh-body:1.6;--lh-ui:1.45;--lh-tight:1.25;
+  --tracking-label:0.09em;--tracking-tight:-0.015em;--tracking-display:-0.02em;
+  --measure-prose:68ch;--measure-narrow:56ch;
+
+  /* Spacing */
+  --space-0:0;--space-1:2px;--space-2:4px;--space-3:8px;--space-4:12px;--space-5:16px;--space-6:24px;--space-7:32px;--space-8:48px;--space-9:64px;--space-10:96px;--space-11:128px;
+  --gutter:24px;--gutter-lg:40px;
+  --section-gap:64px;--section-gap-lg:96px;
+  --container:1200px;--container-wide:1440px;--container-narrow:760px;
+
+  /* Shape */
+  --radius-none:0;--radius-xs:2px;--radius-sm:3px;--radius-md:4px;--radius-pill:999px;
+  --border-hairline:1px;--border-rule:1px;--border-side-rule:3px;--border-emphasis:2px;
+  --shadow-none:none;--shadow-lift:0 1px 2px rgba(1,44,87,.05),0 4px 12px rgba(1,44,87,.06);
+  --ring-focus:0 0 0 2px var(--bg-page),0 0 0 4px var(--focus-ring);
+  --ratio-hero:16 / 9;--ratio-gallery:3 / 2;--ratio-portrait:4 / 5;
+
+  /* Motion */
+  --dur-fast:120ms;--dur-base:180ms;--dur-slow:260ms;
+  --ease-out:cubic-bezier(.2,.6,.2,1);--ease-in-out:cubic-bezier(.4,0,.2,1);
+  --lift-hover:translateY(-1px);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast:0ms;--dur-base:0ms;--dur-slow:0ms;--lift-hover:none;
+  }
+}
+
+/* ---- Base resets ---- */
 @layer base {
-  body {
-    @apply font-sans text-gray-900 bg-white antialiased;
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
+
+  body {
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: var(--lh-body);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: var(--fw-semibold);
+    letter-spacing: var(--tracking-display);
+    margin: 0;
+  }
+
+  p { margin: 0; text-wrap: pretty; }
+
+  a {
+    color: var(--text-link);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  a:hover { color: var(--text-link-hover); }
+
+  :focus-visible { outline: none; box-shadow: var(--ring-focus); }
+
+  table { border-collapse: collapse; }
+
+  ::selection { background: var(--navy-200); }
 }
 
+/* ---- Utility classes ---- */
 @layer utilities {
-  .prose-hawook p {
-    @apply mb-4 leading-relaxed text-gray-700;
+  .hw-label {
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+    font-weight: var(--fw-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--text-secondary);
   }
-  .prose-hawook p:last-child {
-    @apply mb-0;
+
+  .hw-num {
+    font-variant-numeric: tabular-nums;
   }
+
+  /* Prose body for editorial content */
+  .prose-hawook {
+    font-size: var(--text-body-lg);
+    line-height: var(--lh-editorial);
+    color: var(--text-primary);
+    max-width: var(--measure-prose);
+  }
+  .prose-hawook p { margin-bottom: var(--space-6); }
+  .prose-hawook p:last-child { margin-bottom: 0; }
+  .prose-hawook h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-display-4);
+    font-weight: var(--fw-semibold);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-5);
+  }
+  .prose-hawook h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-title);
+    font-weight: var(--fw-semibold);
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-4);
+  }
+  .prose-hawook ul { padding-left: var(--space-6); margin-bottom: var(--space-6); }
+  .prose-hawook li { margin-bottom: var(--space-3); }
 }
