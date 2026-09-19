@@ -38,6 +38,26 @@ const defaultFilters: Filters = {
   rentalProgram: false,
 }
 
+const chipBase: React.CSSProperties = {
+  fontFamily: 'var(--font-sans)',
+  fontSize: 'var(--text-xs)',
+  fontWeight: 'var(--fw-medium)',
+  padding: '6px 12px',
+  borderRadius: 'var(--radius-md)',
+  border: '1px solid var(--rule-strong)',
+  color: 'var(--text-secondary)',
+  background: 'var(--bg-surface)',
+  cursor: 'pointer',
+  transition: 'all var(--dur-base) var(--ease-out)',
+}
+
+const chipActive: React.CSSProperties = {
+  ...chipBase,
+  border: '1px solid var(--rule-brand)',
+  color: 'var(--text-brand)',
+  background: 'var(--bg-subtle-brand)',
+}
+
 export default function ProjectsClient({ projects }: { projects: Project[] }) {
   const [filters, setFilters] = useState<Filters>(defaultFilters)
   const [areaOpen, setAreaOpen] = useState(false)
@@ -100,33 +120,47 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
     filters.rentalProgram
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6">
+    <div style={{ maxWidth: 'var(--container)', margin: '0 auto', padding: '0 var(--gutter)' }}>
       {/* Sticky filter bar */}
-      <div className="sticky top-16 z-40 bg-white border-b border-gray-100 py-4">
-        <div className="flex flex-wrap gap-3 items-center">
+      <div style={{
+        position: 'sticky',
+        top: 64,
+        zIndex: 40,
+        background: 'var(--bg-page)',
+        borderBottom: '1px solid var(--rule)',
+        padding: 'var(--space-4) 0',
+      }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', alignItems: 'center' }}>
+
           {/* Area dropdown */}
-          <div className="relative">
+          <div style={{ position: 'relative' }}>
             <button
               onClick={() => setAreaOpen(!areaOpen)}
-              className={`text-sm font-medium px-3 py-2 rounded-md border transition-colors ${
-                filters.areas.length > 0
-                  ? 'border-teal text-teal bg-teal-light'
-                  : 'border-gray-200 text-gray-600 hover:border-gray-300'
-              }`}
+              style={filters.areas.length > 0 ? chipActive : chipBase}
             >
-              Area{filters.areas.length > 0 ? ` (${filters.areas.length})` : ''}
-              <span className="ml-1">▾</span>
+              Area{filters.areas.length > 0 ? ` (${filters.areas.length})` : ''} ▾
             </button>
             {areaOpen && (
-              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-56 p-3">
-                <div className="grid grid-cols-1 gap-1 max-h-64 overflow-y-auto">
+              <div style={{
+                position: 'absolute',
+                top: 'calc(100% + 6px)',
+                left: 0,
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--rule)',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: 'var(--shadow-lift)',
+                zIndex: 50,
+                width: 220,
+                padding: 'var(--space-4)',
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', maxHeight: 256, overflowY: 'auto' }}>
                   {AREAS.map((area) => (
-                    <label key={area} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer hover:text-gray-900 py-1">
+                    <label key={area} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', cursor: 'pointer', padding: '4px 0' }}>
                       <input
                         type="checkbox"
                         checked={filters.areas.includes(area)}
                         onChange={() => toggleArea(area)}
-                        className="accent-teal"
+                        style={{ accentColor: 'var(--action-primary)' }}
                       />
                       {area}
                     </label>
@@ -137,7 +171,7 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
           </div>
 
           {/* Price presets */}
-          <div className="flex gap-1 flex-wrap">
+          <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
             {PRICE_PRESETS.map((preset) => {
               const active =
                 String(preset.min || '') === filters.priceMin &&
@@ -146,11 +180,7 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
                 <button
                   key={preset.label}
                   onClick={() => applyPreset(preset.min, preset.max)}
-                  className={`text-xs font-medium px-3 py-2 rounded-md border transition-colors ${
-                    active
-                      ? 'border-teal text-teal bg-teal-light'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                  }`}
+                  style={active ? chipActive : chipBase}
                 >
                   {preset.label}
                 </button>
@@ -159,42 +189,33 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
           </div>
 
           {/* Unit types */}
-          <div className="flex gap-1 flex-wrap">
+          <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
             {UNIT_TYPES.map((type) => (
               <button
                 key={type}
                 onClick={() => toggleUnitType(type)}
-                className={`text-xs font-medium px-3 py-2 rounded-md border transition-colors ${
-                  filters.unitTypes.includes(type)
-                    ? 'border-teal text-teal bg-teal-light'
-                    : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                }`}
+                style={filters.unitTypes.includes(type) ? chipActive : chipBase}
               >
                 {type}
               </button>
             ))}
           </div>
 
-          {/* Tag filters */}
           <button
             onClick={() => setFilters((f) => ({ ...f, foreignFreehold: !f.foreignFreehold }))}
-            className={`text-xs font-medium px-3 py-2 rounded-md border transition-colors ${
-              filters.foreignFreehold ? 'border-teal text-teal bg-teal-light' : 'border-gray-200 text-gray-600 hover:border-gray-300'
-            }`}
+            style={filters.foreignFreehold ? chipActive : chipBase}
           >
             Foreign Freehold
           </button>
           <button
             onClick={() => setFilters((f) => ({ ...f, rentalProgram: !f.rentalProgram }))}
-            className={`text-xs font-medium px-3 py-2 rounded-md border transition-colors ${
-              filters.rentalProgram ? 'border-teal text-teal bg-teal-light' : 'border-gray-200 text-gray-600 hover:border-gray-300'
-            }`}
+            style={filters.rentalProgram ? chipActive : chipBase}
           >
             Rental Program
           </button>
 
           {hasFilters && (
-            <button onClick={clearAll} className="text-xs text-gray-400 hover:text-gray-600 underline ml-1">
+            <button onClick={clearAll} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
               Clear all
             </button>
           )}
@@ -202,21 +223,23 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
       </div>
 
       {/* Results */}
-      <div className="py-8">
-        <p className="text-sm text-gray-500 mb-6">
+      <div style={{ padding: 'var(--space-7) 0' }}>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)', marginBottom: 'var(--space-6)' }}>
           Showing {filtered.length} project{filtered.length !== 1 ? 's' : ''}
         </p>
 
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--space-6)' }}>
             {filtered.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-24">
-            <p className="font-serif text-xl text-gray-400 mb-3">No projects match your filters.</p>
-            <button onClick={clearAll} className="text-sm text-teal hover:text-teal-dark">
+          <div style={{ textAlign: 'center', padding: 'var(--space-10) 0' }}>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-lead)', color: 'var(--text-tertiary)', marginBottom: 'var(--space-4)' }}>
+              No projects match your filters.
+            </p>
+            <button onClick={clearAll} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-brand)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
               Try adjusting your search
             </button>
           </div>

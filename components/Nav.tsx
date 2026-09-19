@@ -6,6 +6,13 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
+const NAV_LINKS = [
+  { href: '/projects', label: 'Projects' },
+  { href: '/areas', label: 'Areas' },
+  { href: '/articles', label: 'Articles' },
+  { href: '/about', label: 'About' },
+]
+
 export default function Nav() {
   const pathname = usePathname()
   const router = useRouter()
@@ -32,83 +39,99 @@ export default function Nav() {
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-100">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
+    <nav style={{
+      position: 'sticky',
+      top: 0,
+      zIndex: 50,
+      background: 'var(--bg-surface)',
+      borderBottom: '1px solid var(--rule)',
+    }}>
+      <div style={{ maxWidth: 'var(--container)', margin: '0 auto', padding: '0 var(--gutter)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
+
           {/* Logo */}
-          <Link href="/" className="font-serif text-2xl font-semibold text-gray-900 tracking-tight">
+          <Link href="/" style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '1.375rem',
+            fontWeight: 'var(--fw-semibold)',
+            color: 'var(--text-brand)',
+            textDecoration: 'none',
+            letterSpacing: 'var(--tracking-tight)',
+          }}>
             Hawook
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link
-              href="/projects"
-              className={`text-sm font-medium transition-colors ${isActive('/projects') ? 'text-teal' : 'text-gray-600 hover:text-gray-900'}`}
-            >
-              Projects
-            </Link>
-            <Link
-              href="/areas"
-              className="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              Areas
-            </Link>
-            <Link
-              href="/articles"
-              className={`text-sm font-medium transition-colors ${isActive('/articles') ? 'text-teal' : 'text-gray-400 hover:text-gray-600'}`}
-            >
-              Articles
-            </Link>
-            <Link
-              href="/profiles"
-              className={`text-sm font-medium transition-colors ${isActive('/profiles') ? 'text-teal' : 'text-gray-400 hover:text-gray-600'}`}
-            >
-              Profiles
-            </Link>
-            <Link
-              href="/guides"
-              className={`text-sm font-medium transition-colors ${isActive('/guides') ? 'text-teal' : 'text-gray-400 hover:text-gray-600'}`}
-            >
-              Guides
-            </Link>
-            <Link
-              href="/about"
-              className="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              About
-            </Link>
+          <div className="hidden md:flex" style={{ alignItems: 'center', gap: 'var(--space-8)' }}>
+            {NAV_LINKS.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--fw-medium)',
+                  color: isActive(href) ? 'var(--text-brand)' : 'var(--text-secondary)',
+                  textDecoration: 'none',
+                  transition: 'color var(--dur-base) var(--ease-out)',
+                }}
+              >
+                {label}
+              </Link>
+            ))}
           </div>
 
           {/* Desktop auth */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex" style={{ alignItems: 'center', gap: 'var(--space-4)' }}>
             {user ? (
               <>
-                <Link
-                  href="/dashboard"
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-                >
+                <Link href="/dashboard" style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--fw-medium)',
+                  color: 'var(--text-secondary)',
+                  textDecoration: 'none',
+                }}>
                   Dashboard
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--fw-medium)',
+                    color: 'var(--text-tertiary)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
                 >
                   Sign out
                 </button>
               </>
             ) : (
               <>
-                <Link
-                  href="/login"
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-                >
+                <Link href="/login" style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--fw-medium)',
+                  color: 'var(--text-secondary)',
+                  textDecoration: 'none',
+                }}>
                   Sign in
                 </Link>
-                <Link
-                  href="/signup"
-                  className="text-sm font-medium bg-teal text-white px-4 py-2 rounded-md hover:bg-teal-dark transition-colors"
-                >
+                <Link href="/signup" style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--fw-semibold)',
+                  color: 'var(--text-on-inverse)',
+                  background: 'var(--action-primary)',
+                  padding: '8px 18px',
+                  borderRadius: 'var(--radius-md)',
+                  textDecoration: 'none',
+                  transition: 'background var(--dur-base) var(--ease-out)',
+                }}>
                   Sign up
                 </Link>
               </>
@@ -117,53 +140,64 @@ export default function Nav() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden p-2 text-gray-600"
+            className="md:hidden"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
+            style={{
+              padding: 8,
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-secondary)',
+            }}
           >
-            <span className="block w-5 h-0.5 bg-current mb-1" />
-            <span className="block w-5 h-0.5 bg-current mb-1" />
-            <span className="block w-5 h-0.5 bg-current" />
+            <span style={{ display: 'block', width: 20, height: 1.5, background: 'currentColor', marginBottom: 5 }} />
+            <span style={{ display: 'block', width: 20, height: 1.5, background: 'currentColor', marginBottom: 5 }} />
+            <span style={{ display: 'block', width: 20, height: 1.5, background: 'currentColor' }} />
           </button>
         </div>
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden border-t border-gray-100 py-4 space-y-3">
-            <Link href="/projects" className="block text-sm font-medium text-gray-700 py-1" onClick={() => setMenuOpen(false)}>
-              Projects
-            </Link>
-            <Link href="/areas" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
-              Areas
-            </Link>
-            <Link href="/articles" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
-              Articles
-            </Link>
-            <Link href="/profiles" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
-              Profiles
-            </Link>
-            <Link href="/guides" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
-              Guides
-            </Link>
-            <Link href="/about" className="block text-sm font-medium text-gray-400 py-1" onClick={() => setMenuOpen(false)}>
-              About
-            </Link>
-            <div className="pt-2 border-t border-gray-100 flex gap-3">
+          <div className="md:hidden" style={{
+            borderTop: '1px solid var(--rule)',
+            padding: 'var(--space-6) 0',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-5)',
+          }}>
+            {NAV_LINKS.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--fw-medium)',
+                  color: isActive(href) ? 'var(--text-brand)' : 'var(--text-secondary)',
+                  textDecoration: 'none',
+                }}
+              >
+                {label}
+              </Link>
+            ))}
+            <div style={{ paddingTop: 'var(--space-4)', borderTop: '1px solid var(--rule)', display: 'flex', gap: 'var(--space-4)', alignItems: 'center' }}>
               {user ? (
                 <>
-                  <Link href="/dashboard" className="text-sm font-medium text-gray-700" onClick={() => setMenuOpen(false)}>
+                  <Link href="/dashboard" onClick={() => setMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-medium)', color: 'var(--text-secondary)', textDecoration: 'none' }}>
                     Dashboard
                   </Link>
-                  <button onClick={handleSignOut} className="text-sm font-medium text-gray-500">
+                  <button onClick={handleSignOut} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                     Sign out
                   </button>
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="text-sm font-medium text-gray-600" onClick={() => setMenuOpen(false)}>
+                  <Link href="/login" onClick={() => setMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-medium)', color: 'var(--text-secondary)', textDecoration: 'none' }}>
                     Sign in
                   </Link>
-                  <Link href="/signup" className="text-sm font-medium bg-teal text-white px-4 py-2 rounded-md" onClick={() => setMenuOpen(false)}>
+                  <Link href="/signup" onClick={() => setMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-on-inverse)', background: 'var(--action-primary)', padding: '8px 18px', borderRadius: 'var(--radius-md)', textDecoration: 'none' }}>
                     Sign up
                   </Link>
                 </>

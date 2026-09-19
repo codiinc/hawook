@@ -57,40 +57,92 @@ export default function ArticleRenderer({ article, relatedProjects, isDraftPrevi
   })()
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    <div style={{ maxWidth: 'var(--container)', margin: '0 auto', padding: 'var(--space-9) var(--gutter)' }}>
       {isDraftPreview && (
-        <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-700 font-medium">
+        <div style={{
+          marginBottom: 'var(--space-6)',
+          background: 'var(--brass-50)',
+          border: '1px solid var(--brass-200)',
+          borderRadius: 'var(--radius-md)',
+          padding: 'var(--space-4) var(--space-5)',
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 'var(--fw-medium)',
+          color: 'var(--brass-700)',
+        }}>
           Draft preview — not yet published
         </div>
       )}
 
-      <article className="max-w-2xl">
+      <article style={{ maxWidth: 'var(--container-narrow)' }}>
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-1 rounded">
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+            <span style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-label)',
+              fontWeight: 'var(--fw-bold)',
+              letterSpacing: 'var(--tracking-label)',
+              textTransform: 'uppercase',
+              color: 'var(--text-brand)',
+              background: 'var(--bg-subtle-brand)',
+              padding: '4px 10px',
+              borderRadius: 'var(--radius-xs)',
+            }}>
               {typeLabel}
             </span>
             {article.published_at && (
-              <span className="text-sm text-gray-400">{fmtDate(article.published_at)}</span>
+              <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>
+                {fmtDate(article.published_at)}
+              </span>
             )}
-            <span className="text-sm text-gray-400">{mins} min read</span>
+            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>
+              {mins} min read
+            </span>
             {showLastUpdated && article.last_updated && (
-              <span className="text-sm text-gray-400">
-                Last updated: {fmtDate(article.last_updated)}
+              <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>
+                Updated {fmtDate(article.last_updated)}
               </span>
             )}
           </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-medium text-gray-900 leading-tight mb-4">
+
+          <h1 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(1.75rem, 4vw, var(--text-display-4))',
+            fontWeight: 'var(--fw-medium)',
+            color: 'var(--text-brand)',
+            lineHeight: 'var(--lh-title)',
+            letterSpacing: 'var(--tracking-tight)',
+            margin: '0 0 var(--space-5)',
+          }}>
             {article.title}
           </h1>
+
           {article.author_name && (
-            <p className="text-sm text-gray-500">By {article.author_name}</p>
+            <p style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-sm)',
+              color: 'var(--text-secondary)',
+              margin: '0 0 var(--space-4)',
+            }}>
+              By {article.author_name}
+            </p>
           )}
+
           {(article.tags ?? []).length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
               {(article.tags ?? []).map(tag => (
-                <span key={tag} className="text-xs text-teal bg-teal-light px-2 py-1 rounded">{tag}</span>
+                <span key={tag} style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--fw-medium)',
+                  color: 'var(--text-brand)',
+                  background: 'var(--bg-subtle-brand)',
+                  padding: '3px 8px',
+                  borderRadius: 'var(--radius-xs)',
+                }}>
+                  {tag}
+                </span>
               ))}
             </div>
           )}
@@ -98,13 +150,13 @@ export default function ArticleRenderer({ article, relatedProjects, isDraftPrevi
 
         {/* Hero image */}
         {article.hero_image_url && (
-          <div className="mb-8 rounded-xl overflow-hidden aspect-[16/9] relative">
+          <div style={{ marginBottom: 'var(--space-8)', borderRadius: 'var(--radius-md)', overflow: 'hidden', aspectRatio: '16/9', position: 'relative' }}>
             <Image
               src={article.hero_image_url}
               alt={article.title}
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 672px"
+              sizes="(max-width: 768px) 100vw, 760px"
               priority
               placeholder="blur"
               blurDataURL={BLUR_PLACEHOLDER}
@@ -116,15 +168,23 @@ export default function ArticleRenderer({ article, relatedProjects, isDraftPrevi
         {article.body_mdx ? (
           <MarkdownContent content={article.body_mdx} />
         ) : (
-          <p className="text-gray-400 italic">No content yet.</p>
+          <p style={{ fontFamily: 'var(--font-sans)', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>No content yet.</p>
         )}
       </article>
 
-      {/* Footer: related projects */}
+      {/* Related projects */}
       {relatedProjects.length > 0 && (
-        <div className="mt-16 max-w-4xl">
-          <h2 className="font-serif text-2xl font-medium text-gray-900 mb-6">Related projects</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div style={{ marginTop: 'var(--space-10)', maxWidth: 960 }}>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-display-4)',
+            fontWeight: 'var(--fw-medium)',
+            color: 'var(--text-brand)',
+            margin: '0 0 var(--space-7)',
+          }}>
+            Related projects
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--space-6)' }}>
             {relatedProjects.map(p => (
               <ProjectCard key={p.id} project={p} />
             ))}
@@ -132,16 +192,27 @@ export default function ArticleRenderer({ article, relatedProjects, isDraftPrevi
         </div>
       )}
 
-      {/* Footer: related areas */}
+      {/* Related areas */}
       {relatedAreas.length > 0 && (
-        <div className="mt-10">
-          <p className="text-sm font-medium text-gray-500 mb-3">Relevant areas</p>
-          <div className="flex flex-wrap gap-2">
+        <div style={{ marginTop: 'var(--space-8)' }}>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-medium)', color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
+            Relevant areas
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
             {relatedAreas.map(areaSlug => (
               <Link
                 key={areaSlug}
                 href={`/areas/${areaSlug}`}
-                className="text-sm text-teal bg-teal-light px-3 py-1.5 rounded-md hover:bg-teal/20 transition-colors"
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--fw-medium)',
+                  color: 'var(--text-brand)',
+                  background: 'var(--bg-subtle-brand)',
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  textDecoration: 'none',
+                }}
               >
                 {areaSlug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
               </Link>

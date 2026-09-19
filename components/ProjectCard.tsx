@@ -15,8 +15,17 @@ export default function ProjectCard({ project }: Props) {
   const teaser = project.hawook_intro ? project.hawook_intro.slice(0, 100) + '…' : null
 
   return (
-    <Link href={href} className="group block bg-cream rounded-lg overflow-hidden border border-gray-100 hover:border-teal/30 transition-colors">
-      <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
+    <Link href={href} className="group" style={{
+      display: 'block',
+      background: 'var(--bg-surface)',
+      borderRadius: 'var(--radius-sm)',
+      overflow: 'hidden',
+      border: '1px solid var(--rule)',
+      textDecoration: 'none',
+      boxShadow: 'var(--shadow-lift)',
+      transition: 'box-shadow var(--dur-base) var(--ease-out)',
+    }}>
+      <div style={{ aspectRatio: 'var(--ratio-gallery)', background: 'var(--bg-tint)', position: 'relative', overflow: 'hidden' }}>
         {project.cover_image_url ? (
           <Image
             src={project.cover_image_url}
@@ -28,37 +37,83 @@ export default function ProjectCard({ project }: Props) {
             blurDataURL={BLUR_PLACEHOLDER}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="font-serif text-gray-300 text-sm">No image</span>
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontFamily: 'var(--font-display)', color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)' }}>No image</span>
           </div>
         )}
         {project.construction_status && (
-          <span className="absolute top-3 left-3 bg-white text-gray-700 text-xs font-medium px-2 py-1 rounded">
+          <span style={{
+            position: 'absolute',
+            top: 12,
+            left: 12,
+            background: 'var(--bg-surface)',
+            color: 'var(--text-secondary)',
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-xs)',
+            fontWeight: 'var(--fw-medium)',
+            padding: '4px 8px',
+            borderRadius: 'var(--radius-xs)',
+          }}>
             {project.construction_status}
           </span>
         )}
       </div>
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="font-serif text-lg font-medium text-gray-900 leading-snug group-hover:text-teal transition-colors">
+      <div style={{ padding: 'var(--space-6)' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
+          <h3 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-lead)',
+            fontWeight: 'var(--fw-medium)',
+            color: 'var(--text-brand)',
+            lineHeight: 'var(--lh-title)',
+            margin: 0,
+          }}>
             {project.project_name}
           </h3>
           {project.area && (
-            <span className="shrink-0 text-xs text-teal bg-teal-light px-2 py-0.5 rounded font-medium mt-0.5">
+            <span style={{
+              flexShrink: 0,
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-xs)',
+              fontWeight: 'var(--fw-medium)',
+              color: 'var(--text-brand)',
+              background: 'var(--bg-subtle-brand)',
+              padding: '3px 8px',
+              borderRadius: 'var(--radius-xs)',
+              marginTop: 2,
+            }}>
               {project.area}
             </span>
           )}
         </div>
         {project.hawook_badge && (
-          <div className="mb-2">
+          <div style={{ marginBottom: 'var(--space-3)' }}>
             <HawookBadge badge={project.hawook_badge} />
           </div>
         )}
-        <p className="text-sm font-medium text-gray-900 mb-3">
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 'var(--fw-semibold)',
+          color: 'var(--text-primary)',
+          marginBottom: teaser ? 'var(--space-4)' : 0,
+        }}>
           {formatPriceFrom(project.price_min)}
         </p>
         {teaser && (
-          <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{teaser}</p>
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-sm)',
+            color: 'var(--text-secondary)',
+            lineHeight: 'var(--lh-editorial)',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical' as const,
+            overflow: 'hidden',
+            margin: 0,
+          }}>
+            {teaser}
+          </p>
         )}
       </div>
     </Link>
