@@ -33,9 +33,9 @@ Hawook covers Bang Tao as our second priority area after Rawai and Nai Harn. The
 
 **It's the strongest short-stay rental market on the island.** For investors prioritising peak-season nightly rates, Bang Tao outperforms every other Phuket area. The November-March high season produces premium rental yields here, particularly for furnished branded residences with managed rental programs. Year-round occupancy is typically 60-75% for well-located properties versus 40-55% for non-Bang Tao alternatives.
 
-**The schools matter.** UWC Thailand (one of Asia's most respected international schools) and BCIS are both within a 10-15 minute drive. For buyers with school-age children — a meaningful slice of the foreign-buyer market — this is genuinely the most practical area to live in Phuket. Many family-buyer decisions effectively come down to "where can the kids walk to school from?" and Bang Tao answers that better than any alternative.
+**The schools matter.** UWC Thailand (one of Asia's most respected international schools) and BCIS are both within a 10-15 minute drive. For buyers with school-age children — a meaningful slice of the foreign-buyer market — this is genuinely the most practical area to live in Phuket.
 
-**It's developed-feeling, not "frontier."** Unlike Rawai/Nai Harn, where parts of the area still feel residential-village and the infrastructure has clearly grown organically, Bang Tao feels planned. Wide roads, consistent commercial corridors, branded developments behind perimeter walls. Some buyers find this premium; others find it sterile.
+**It's developed-feeling, not "frontier."** Unlike Rawai/Nai Harn, where parts of the area still feel residential-village and the infrastructure has clearly grown organically, Bang Tao feels planned. Wide roads, consistent commercial corridors, branded developments behind perimeter walls.
 
 **Pricing is meaningfully higher than other areas.** Entry-level condos start around 5-7M THB in Bang Tao versus 3-4M THB in Rawai/Nai Harn for comparable size. Villa pricing varies enormously — branded freehold villas start around 30M THB and run well past 100M THB for premium product.
 
@@ -45,47 +45,31 @@ Hawook covers Bang Tao as our second priority area after Rawai and Nai Harn. The
 
 **Buyers with school-age children.** UWC and BCIS proximity is genuinely meaningful. Daily school runs from other Phuket areas are tedious; Bang Tao is the practical answer.
 
-**Buyers wanting walkable beach + resort lifestyle.** Many Bang Tao developments are within walking distance of the beach. Restaurants, beach clubs, and resort amenities are accessible without driving. This is rare elsewhere on the island.
+**Buyers wanting walkable beach + resort lifestyle.** Many Bang Tao developments are within walking distance of the beach. Restaurants, beach clubs, and resort amenities are accessible without driving.
 
-**Buyers wanting a more "international" feel.** If your priority is a community that feels familiar (English-speaking, internationally-staffed services, consistent infrastructure), Bang Tao is the right choice.
-
-**Buyers with higher budgets.** If your budget is genuinely 10M+ THB for a condo or 30M+ THB for a villa, Bang Tao is where the best inventory in that range is concentrated. Below that, the price-to-quality ratio in Bang Tao gets less favourable, and Rawai/Nai Harn becomes more competitive on value.
+**Buyers with higher budgets.** If your budget is genuinely 10M+ THB for a condo or 30M+ THB for a villa, Bang Tao is where the best inventory in that range is concentrated.
 
 ## Who should look elsewhere
 
-**Buyers wanting quieter, more authentic Thai-residential character.** Bang Tao is firmly international-resort in character. If you're looking for the part of Phuket that still feels like Thailand, this isn't it.
+**Buyers wanting quieter, more authentic Thai-residential character.** Bang Tao is firmly international-resort in character.
 
 **Buyers prioritising long-stay rental over short-stay.** The buyer market here is heavily seasonal. Long-stay rental tenants are harder to find and produce flatter returns than in residential-resident areas like Rawai.
 
-**Value-conscious buyers under 7M THB.** At the entry level, Bang Tao's price-to-quality ratio is typically less favourable than Rawai/Nai Harn. You can find better-built, better-located condos for the same money in southern Phuket.
-
-**Buyers prioritising the airport.** Bang Tao to the airport is 15-25 minutes — closer than Rawai but not as close as the projects right on the Mai Khao side. For frequent international travelers, the Mai Khao/Layan northern end of Bang Tao works best; the Cherngtalay/Surin southern end adds 10 minutes.
-
-**Buyers wanting genuine local food culture.** There are excellent restaurants in Bang Tao, but most are international-resort restaurants serving international cuisine at international prices. For Thai food culture and local markets, Rawai and Phuket Town are stronger.
+**Value-conscious buyers under 7M THB.** At the entry level, Bang Tao's price-to-quality ratio is typically less favourable than Rawai/Nai Harn.
 
 ## Sub-areas within Bang Tao
 
-Bang Tao is large enough that the sub-areas matter meaningfully for buyer decisions:
+**Laguna / Cherngtalay.** The original integrated resort area. Most established. Highest concentration of branded residences and managed rental programs. Best fit for buyers prioritising rental program management and immediate amenity access.
 
-**Laguna / Cherngtalay.** The original integrated resort area, anchored by the Laguna Phuket complex. Most established. Highest concentration of branded residences and managed rental programs. Most pedestrian-friendly area within Bang Tao. Best fit for buyers prioritising rental program management and immediate amenity access.
+**Surin / South Bang Tao.** Closer to Patong. Pretty beach. Mix of villas and condos. Best fit for buyers wanting a quieter feel within Bang Tao while still being close to action.
 
-**Surin / South Bang Tao.** Closer to Patong, slightly more nightlife adjacent. Pretty beach (Surin Beach itself is excellent). Mix of villas and condos. Slightly older residential character. Best fit for buyers wanting a quieter feel within Bang Tao while still being close to action.
+**Layan / North Bang Tao.** Closer to the airport. More villa-heavy. Some of the most premium new launches are here. Best fit for buyers wanting privacy, large villas, and proximity to the airport.
 
-**Layan / North Bang Tao.** Closer to the airport. More villa-heavy. Some of the most premium new launches are here (branded residences, luxury villa estates). Quieter and more spread out. Best fit for buyers wanting privacy, large villas, and proximity to the airport.
-
-**Inland Bang Tao (Cherngtalay east of the bypass).** More residential-affordable. Less premium feel. Some good-value condos and townhomes here. Best fit for value-conscious buyers who prioritise Bang Tao's amenities but don't need beachside or premium-branded inventory.
-
-When we review Bang Tao projects, we always note which sub-area the project sits in and whether the sub-area suits the project's positioning.
+**Inland Bang Tao (Cherngtalay east of the bypass).** More residential-affordable. Less premium feel. Best fit for value-conscious buyers who prioritise Bang Tao's amenities but don't need beachside or premium-branded inventory.
 
 ## What we're tracking in Bang Tao
 
 Hawook covers a curated selection of Bang Tao projects across the sub-areas above. Pricing in our Bang Tao catalog spans roughly 5-8M THB entry-level condos through 100M+ THB branded villas. Status mix includes pre-launch, under-construction, and recently-completed inventory.
-
-## What's coming
-
-We'll continue expanding Bang Tao coverage as new developments meet our review bar. Particular focus on the new branded residence launches in Layan and the next wave of pre-construction launches in Laguna. We'll also be publishing more granular guides on specific sub-areas (Laguna, Surin, Layan, Cherngtalay inland) as we go deeper.
-
-If you're considering buying in Bang Tao and want to discuss your specific criteria — budget, rental program priorities, sub-area preferences, school-proximity needs — get in touch via WhatsApp or the project enquiry forms.
 
 ---
 
@@ -106,43 +90,40 @@ export default async function BangTaoPage() {
   const projectList = (projects ?? []) as Project[]
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-      {/* Editorial content */}
-      <div className="max-w-2xl">
+    <div style={{ maxWidth: 'var(--container)', margin: '0 auto', padding: 'var(--space-9) var(--gutter)' }}>
+      <div style={{ maxWidth: 'var(--container-narrow)' }}>
         <MarkdownContent content={editorialContent} />
       </div>
 
-      {/* Project grid */}
-      <div className="mt-16">
-        <h2 className="font-serif text-2xl font-medium text-gray-900 mb-6">
+      <div style={{ marginTop: 'var(--space-10)' }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display-4)', fontWeight: 'var(--fw-medium)', color: 'var(--text-brand)', margin: '0 0 var(--space-7)' }}>
           Our Bang Tao coverage
         </h2>
         {projectList.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projectList.map(p => (
-              <ProjectCard key={p.id} project={p} />
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--space-6)' }}>
+            {projectList.map(p => <ProjectCard key={p.id} project={p} />)}
           </div>
         ) : (
-          <p className="text-gray-500 text-sm">
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>
             No published projects yet — check back soon.
           </p>
         )}
       </div>
 
-      {/* WhatsApp CTA */}
-      <div className="mt-16 bg-cream rounded-xl border border-gray-200 p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6">
-        <div className="flex-1">
-          <p className="font-serif text-xl font-medium text-gray-900 mb-1">Talk to us about this area</p>
-          <p className="text-gray-600 text-sm leading-relaxed">
-            Not sure which projects suit your criteria? Message Yogi on WhatsApp — we know every active development in Bang Tao and can point you in the right direction in minutes.
+      <div style={{ marginTop: 'var(--space-10)', background: 'var(--bg-inverse)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-8)', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', alignItems: 'flex-start' }} className="sm:flex-row sm:items-center">
+        <div style={{ flex: 1 }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-title)', fontWeight: 'var(--fw-medium)', color: 'var(--text-on-inverse)', margin: '0 0 var(--space-3)' }}>
+            Talk to us about this area
+          </p>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-on-inverse-muted)', lineHeight: 'var(--lh-editorial)', margin: 0 }}>
+            Not sure which projects suit your criteria? We know every active development in Bang Tao and can point you in the right direction in minutes.
           </p>
         </div>
         <Link
           href={waHref}
           target="_blank"
           rel="noopener noreferrer"
-          className="shrink-0 text-sm font-medium bg-teal text-white px-5 py-3 rounded-md hover:opacity-90 transition-opacity whitespace-nowrap"
+          style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-brand)', background: 'var(--bg-surface)', padding: '10px 20px', borderRadius: 'var(--radius-md)', textDecoration: 'none', whiteSpace: 'nowrap' }}
         >
           WhatsApp us
         </Link>

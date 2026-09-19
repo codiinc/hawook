@@ -154,12 +154,12 @@ export default function LeadForm({ projectSlug, projectName, initialName, initia
   if (success) {
     const firstName = form.name.trim().split(' ')[0]
     const whatsappMsg = encodeURIComponent(
-      `Hi Yogi, I just submitted an enquiry about ${projectName} on Hawook. Happy to chat now.`
+      `Hi, I just submitted an enquiry about ${projectName} on Hawook. Happy to chat now.`
     )
     return (
       <div className="border border-teal/30 rounded-xl p-6 sm:p-8 bg-teal-light">
         <p className="font-serif text-lg font-medium text-gray-900 mb-3">
-          Thanks {firstName} — Yogi will be in touch within the next hour during Phuket business hours. Watch for an email from hello@hawook.com.
+          Thanks {firstName} &mdash; we&apos;ll be in touch within the next hour during Phuket business hours. Watch for an email from hello@hawook.com.
         </p>
         <a
           href={`https://wa.me/66805100129?text=${whatsappMsg}`}
@@ -179,7 +179,7 @@ export default function LeadForm({ projectSlug, projectName, initialName, initia
   return (
     <div className="border border-gray-200 rounded-xl p-6 sm:p-8 bg-white">
       <h3 className="font-serif text-xl font-medium text-gray-900 mb-1">Get the full details</h3>
-      <p className="text-sm text-gray-500 mb-6">Yogi will send you pricing, floor plans, and current availability within the hour.</p>
+      <p className="text-sm text-gray-500 mb-6">We&apos;ll send you pricing, floor plans, and current availability within the hour.</p>
 
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
         {/* Honeypot — invisible to humans */}

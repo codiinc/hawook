@@ -53,15 +53,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params
 
-  const { data: article } = await supabaseAdmin
+  const { data: raw } = await supabaseAdmin
     .from('blog_articles')
-    .select('slug, title, body_mdx, article_type, published_at, last_updated, tags, hero_image_url, seo_title, seo_description, seo_keywords, related_project_ids, related_area_slugs')
+    .select('slug, title, body_mdx, article_type, published_at, last_updated, tags, hero_image_url, seo_title, seo_description, seo_keywords, related_project_ids, related_area_slugs, byline_slug, authors:byline_slug(display_name)')
     .eq('slug', slug)
     .eq('status', 'published')
     .eq('article_type', 'article')
     .single()
 
-  if (!article) notFound()
+  if (!raw) notFound()
+
+  const authorRow = raw.authors as unknown as { display_name: string } | null
+  const article = {
+    ...raw,
+    author_name: authorRow?.display_name ?? null,
+  }
 
   const articleSchema = {
     '@context': 'https://schema.org',

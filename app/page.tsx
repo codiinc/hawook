@@ -38,72 +38,124 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative bg-cream overflow-hidden">
+      <section style={{ background: 'var(--bg-inverse-deep)', overflow: 'hidden', position: 'relative' }}>
+        {/* Subtle grid texture */}
         <div
-          className="absolute inset-0 opacity-[0.04]"
+          aria-hidden
           style={{
-            backgroundImage: `linear-gradient(#0F6E56 1px, transparent 1px), linear-gradient(to right, #0F6E56 1px, transparent 1px)`,
+            position: 'absolute',
+            inset: 0,
+            opacity: 0.06,
+            backgroundImage: `linear-gradient(var(--navy-300) 1px, transparent 1px), linear-gradient(to right, var(--navy-300) 1px, transparent 1px)`,
             backgroundSize: '48px 48px',
           }}
         />
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-32">
-          <div className="max-w-2xl">
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium text-gray-900 leading-tight mb-6">
+        <div style={{
+          position: 'relative',
+          maxWidth: 'var(--container)',
+          margin: '0 auto',
+          padding: 'var(--space-10) var(--gutter)',
+        }}>
+          <div style={{ maxWidth: '640px' }}>
+            <h1 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2.5rem, 5vw, var(--text-display-2))',
+              fontWeight: 'var(--fw-medium)',
+              color: 'var(--text-on-inverse)',
+              lineHeight: 'var(--lh-display)',
+              letterSpacing: 'var(--tracking-display)',
+              margin: '0 0 var(--space-6)',
+            }}>
               Phuket property, honestly reviewed.
             </h1>
-            <p className="text-lg sm:text-xl text-gray-600 leading-relaxed mb-10 max-w-xl">
+            <p style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-body-lg)',
+              color: 'var(--text-on-inverse-muted)',
+              lineHeight: 'var(--lh-editorial)',
+              margin: '0 0 var(--space-8)',
+              maxWidth: 'var(--measure-narrow)',
+            }}>
               Browse off-plan developments with independent pricing, ROI analysis, and area guides — no sales spin.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/projects"
-                className="inline-flex items-center justify-center bg-teal text-white font-medium px-6 py-3 rounded-md hover:bg-teal-dark transition-colors"
-              >
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
+              <Link href="/projects" style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-body)',
+                fontWeight: 'var(--fw-semibold)',
+                color: 'var(--text-on-inverse)',
+                background: 'var(--rule-brand)',
+                border: '1px solid var(--navy-700)',
+                padding: '12px 24px',
+                borderRadius: 'var(--radius-md)',
+                textDecoration: 'none',
+              }}>
                 Browse projects
               </Link>
-              {user ? (
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center justify-center border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-md hover:border-gray-400 hover:text-gray-900 transition-colors bg-white"
-                >
-                  Go to dashboard
-                </Link>
-              ) : (
-                <Link
-                  href="/signup"
-                  className="inline-flex items-center justify-center border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-md hover:border-gray-400 hover:text-gray-900 transition-colors bg-white"
-                >
-                  Get free access
-                </Link>
-              )}
+              <Link href={user ? '/dashboard' : '/signup'} style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-body)',
+                fontWeight: 'var(--fw-medium)',
+                color: 'var(--text-on-inverse)',
+                background: 'transparent',
+                border: '1px solid var(--rule-inverse)',
+                padding: '12px 24px',
+                borderRadius: 'var(--radius-md)',
+                textDecoration: 'none',
+              }}>
+                {user ? 'Go to dashboard' : 'Get free access'}
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
       {/* Featured projects */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-        <h2 className="font-serif text-2xl sm:text-3xl font-medium text-gray-900 mb-10">Latest projects</h2>
+      <section style={{
+        maxWidth: 'var(--container)',
+        margin: '0 auto',
+        padding: 'var(--space-10) var(--gutter)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 'var(--space-8)', gap: 'var(--space-5)' }}>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-display-4)',
+            fontWeight: 'var(--fw-medium)',
+            color: 'var(--text-brand)',
+            margin: 0,
+            lineHeight: 'var(--lh-title)',
+          }}>
+            Latest projects
+          </h2>
+          <Link href="/projects" style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--fw-medium)',
+            color: 'var(--text-secondary)',
+            textDecoration: 'none',
+            flexShrink: 0,
+          }}>
+            View all →
+          </Link>
+        </div>
 
         {projects && projects.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project) => (
-                <ProjectCard key={project.id} project={project as Project} />
-              ))}
-            </div>
-            <div className="mt-10 text-center">
-              <Link
-                href="/projects"
-                className="inline-flex items-center gap-2 text-teal font-medium hover:text-teal-dark transition-colors"
-              >
-                View all projects →
-              </Link>
-            </div>
-          </>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--space-6)' }}>
+            {projects.map((project) => (
+              <ProjectCard key={project.id} project={project as Project} />
+            ))}
+          </div>
         ) : (
-          <div className="text-center py-16">
-            <p className="font-serif text-xl text-gray-400">Projects coming soon.</p>
+          <div style={{ textAlign: 'center', padding: 'var(--space-10) 0' }}>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-lead)', color: 'var(--text-tertiary)' }}>
+              Projects coming soon.
+            </p>
           </div>
         )}
       </section>

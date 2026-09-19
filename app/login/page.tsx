@@ -13,6 +13,19 @@ export default function LoginPage() {
   )
 }
 
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  border: '1px solid var(--rule-strong)',
+  borderRadius: 'var(--radius-md)',
+  padding: '10px 12px',
+  fontFamily: 'var(--font-sans)',
+  fontSize: 'var(--text-sm)',
+  color: 'var(--text-primary)',
+  background: 'var(--bg-surface)',
+  outline: 'none',
+  boxSizing: 'border-box',
+}
+
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -27,25 +40,14 @@ function LoginForm() {
     e.preventDefault()
     setError('')
     setLoading(true)
-
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-      return
-    }
-
-    const redirectTo = searchParams.get('redirectTo') ?? '/projects'
-    router.push(redirectTo)
+    if (error) { setError(error.message); setLoading(false); return }
+    router.push(searchParams.get('redirectTo') ?? '/projects')
     router.refresh()
   }
 
   async function handleForgotPassword() {
-    if (!email) {
-      setError('Enter your email address first.')
-      return
-    }
+    if (!email) { setError('Enter your email address first.'); return }
     setLoading(true)
     await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${location.origin}/auth/callback?next=/dashboard`,
@@ -55,71 +57,59 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center px-4">
-      <div className="bg-white rounded-xl border border-gray-100 p-8 max-w-md w-full">
-        <div className="mb-8">
-          <Link href="/" className="font-serif text-xl font-semibold text-gray-900">Hawook</Link>
-          <h1 className="font-serif text-2xl font-medium text-gray-900 mt-4 mb-1">Sign in</h1>
-          <p className="text-sm text-gray-500">Access your saved projects and full data.</p>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-page)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-5)' }}>
+      <div style={{ background: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--rule)', padding: 'var(--space-8)', maxWidth: 400, width: '100%', boxShadow: 'var(--shadow-lift)' }}>
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <Link href="/" style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-title)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-brand)', textDecoration: 'none' }}>
+            Hawook
+          </Link>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display-4)', fontWeight: 'var(--fw-medium)', color: 'var(--text-brand)', margin: 'var(--space-5) 0 var(--space-2)' }}>
+            Sign in
+          </h1>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0 }}>
+            Access your saved projects and full data.
+          </p>
         </div>
 
         {resetSent ? (
-          <div className="bg-teal-light rounded-md p-4 text-sm text-teal">
+          <div style={{ background: 'var(--bg-subtle-brand)', border: '1px solid var(--navy-200)', borderRadius: 'var(--radius-md)', padding: 'var(--space-5)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-brand)' }}>
             Password reset link sent to <strong>{email}</strong>. Check your inbox.
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-                className="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal"
-                placeholder="you@example.com"
-              />
+              <label style={{ display: 'block', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-medium)', color: 'var(--text-primary)', marginBottom: 6 }}>
+                Email
+              </label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" placeholder="you@example.com" style={inputStyle} />
             </div>
             <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-sm font-medium text-gray-700">Password</label>
-                <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  className="text-xs text-gray-400 hover:text-teal transition-colors"
-                >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <label style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-medium)', color: 'var(--text-primary)' }}>
+                  Password
+                </label>
+                <button type="button" onClick={handleForgotPassword} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                   Forgot password?
                 </button>
               </div>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                className="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal"
-                placeholder="Your password"
-              />
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" placeholder="Your password" style={inputStyle} />
             </div>
 
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">{error}</p>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--terracotta-700)', background: 'var(--terracotta-100)', padding: '10px 12px', borderRadius: 'var(--radius-md)', margin: 0 }}>
+                {error}
+              </p>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-teal text-white font-medium py-2.5 rounded-md hover:bg-teal-dark transition-colors disabled:opacity-60"
-            >
+            <button type="submit" disabled={loading} style={{ width: '100%', background: loading ? 'var(--disabled-bg)' : 'var(--action-primary)', color: loading ? 'var(--disabled-text)' : 'var(--text-on-inverse)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', padding: '11px', borderRadius: 'var(--radius-md)', border: 'none', cursor: loading ? 'not-allowed' : 'pointer' }}>
               {loading ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
         )}
 
-        <p className="mt-6 text-sm text-center text-gray-500">
+        <p style={{ marginTop: 'var(--space-6)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', textAlign: 'center', color: 'var(--text-secondary)' }}>
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-teal hover:text-teal-dark font-medium">
+          <Link href="/signup" style={{ color: 'var(--text-brand)', fontWeight: 'var(--fw-semibold)', textDecoration: 'none' }}>
             Sign up free
           </Link>
         </p>

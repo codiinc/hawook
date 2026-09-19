@@ -8,20 +8,25 @@ import type { BuyerQA } from '@/lib/types'
 import FollowButton from './FollowButton'
 import GatedContentTracker from './GatedContentTracker'
 import LeadForm from './LeadForm'
-import HawookBadge from '@/components/HawookBadge'
-import HawookTake from '@/components/HawookTake'
 import MarkdownContent from '@/components/MarkdownContent'
+import { ScoreDisplay } from '@/components/ds/ScoreDisplay'
+import { ScoreBreakdown, SCORE_DIMENSIONS } from '@/components/ds/ScoreBreakdown'
+import { Callout } from '@/components/ds/Callout'
+import { SectionHeader } from '@/components/ds/SectionHeader'
+import { DataList } from '@/components/ds/DataList'
 
 const DOC_TYPE_LABELS: Record<string, string> = {
-  sales_presentation: 'Sales Presentation',
+  sales_presentation: 'Sales presentation',
   brochure: 'Brochure',
-  price_list: 'Price List',
-  payment_plan: 'Payment Plan',
-  foreign_quota_letter: 'Foreign Quota Letter',
-  floor_plan_set: 'Floor Plan Set',
-  spa_template: 'SPA Template',
+  price_list: 'Price list',
+  payment_plan: 'Payment plan',
+  foreign_quota_letter: 'Foreign quota letter',
+  floor_plan_set: 'Floor plan set',
+  spa_template: 'SPA template',
   other: 'Other',
 }
+
+const BLUR_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjY3NSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0VCRTZERSIvPjwvc3ZnPg=='
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -37,13 +42,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!data) return {}
   const row = data as Record<string, string | null>
 
+  const pageTitle = row.project_name ?? undefined
+  const ogTitle = row.project_name ? `${row.project_name} | Hawook` : undefined
+  const description = row.seo_description ?? undefined
+
   return {
-    title: row.seo_title ?? row.project_name,
-    description: row.seo_description ?? undefined,
+    title: pageTitle,
+    description,
     alternates: { canonical: `https://app.hawook.com/projects/${slug}` },
     openGraph: {
-      title: (row.seo_title ?? row.project_name) ?? undefined,
-      description: row.seo_description ?? undefined,
+      title: ogTitle,
+      description,
       url: `https://app.hawook.com/projects/${slug}`,
       siteName: 'Hawook',
       images: row.cover_image_url ? [{ url: row.cover_image_url.replace('/upload/', '/upload/c_fill,g_auto,w_1200,h_630,f_jpg,q_auto/'), width: 1200, height: 630 }] : [],
@@ -52,8 +61,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: (row.seo_title ?? row.project_name) ?? undefined,
-      description: row.seo_description ?? undefined,
+      title: ogTitle,
+      description,
       images: row.cover_image_url ? [row.cover_image_url.replace('/upload/', '/upload/c_fill,g_auto,w_1200,h_630,f_jpg,q_auto/')] : [],
     },
   }
@@ -63,13 +72,6 @@ export default async function ProjectPage({ params }: Props) {
   const { slug } = await params
   const supabase = await createClient()
 
-  // Public, safe-column read via the projects_public view. Internal fields
-  // (hawook_score, description_private, data_confidence, flagged_fields,
-  // source_file_url, extraction_notes, etc.) and gated/member-only fields
-  // (roi_model, unit_price_list, investment_commentary, cam/sinking fees,
-  // floorplan_urls, price_per_sqm) are NOT exposed here. buyer_qa returned by
-  // the view is already filtered to public-visibility entries. Gated fields are
-  // fetched separately below, only for authenticated users.
   const { data: projectData } = await supabase
     .from('projects_public')
     .select(`
@@ -88,7 +90,7 @@ export default async function ProjectPage({ params }: Props) {
       furniture_included, furniture_notes, management_company,
       seo_title, seo_description, seo_focus_keyword, seo_keywords,
       hawook_intro, hawook_take, design_commentary,
-      hawook_verdict, hawook_badge,
+      hawook_verdict, hawook_badge, hawook_score,
       page_status, published_at, last_updated, created_at, location_description
     `)
     .eq('slug', slug)
@@ -98,20 +100,10 @@ export default async function ProjectPage({ params }: Props) {
 
   if (!projectData) notFound()
 
-  // Extract all fields as typed locals so JSX inference works correctly
   const raw = projectData as Record<string, unknown>
-  const s = (k: string): string | null => {
-    const v = raw[k]
-    return typeof v === 'string' ? v : null
-  }
-  const b = (k: string): boolean | null => {
-    const v = raw[k]
-    return typeof v === 'boolean' ? v : null
-  }
-  const num = (k: string): number | null => {
-    const v = raw[k]
-    return typeof v === 'number' ? v : null
-  }
+  const s = (k: string): string | null => { const v = raw[k]; return typeof v === 'string' ? v : null }
+  const b = (k: string): boolean | null => { const v = raw[k]; return typeof v === 'boolean' ? v : null }
+  const num = (k: string): number | null => { const v = raw[k]; return typeof v === 'number' ? v : null }
 
   const id = s('id') ?? ''
   const projectName = s('project_name') ?? ''
@@ -120,9 +112,13 @@ export default async function ProjectPage({ params }: Props) {
   const developerName = s('developer_name')
   const constructionStatus = s('construction_status')
   const coverImageUrl = s('cover_image_url')
+  const coverImageType = s('cover_image_type')
+  const galleryUrlsRaw = raw['gallery_urls']
+  const galleryTypesRaw = raw['gallery_types']
   const hawookIntro = s('hawook_intro')
   const hawookTakeText = s('hawook_take')
   const hawookBadge = s('hawook_badge')
+  const hawookScore = num('hawook_score')
   const descriptionPublic = s('description_public')
   const designCommentary = s('design_commentary')
   const hawookVerdict = s('hawook_verdict')
@@ -140,12 +136,15 @@ export default async function ProjectPage({ params }: Props) {
   const uniqueFeatures = raw['unique_features']
   const buyerQARaw = raw['buyer_qa']
   const marketComparisonRaw = raw['market_comparison']
+  const isCGI = coverImageType === 'cgi' || coverImageType === 'render'
 
   const verdict = parseVerdict(hawookVerdict)
   const allQA = Array.isArray(buyerQARaw) ? (buyerQARaw as BuyerQA[]) : []
   const publicQA = allQA.filter((q) => q.visibility === 'public')
 
-  // Documents — RLS automatically filters: anon gets is_gated=false only; auth gets all
+  const galleryUrls = Array.isArray(galleryUrlsRaw) ? (galleryUrlsRaw as string[]) : []
+  const galleryTypes = Array.isArray(galleryTypesRaw) ? (galleryTypesRaw as string[]) : []
+
   const { data: projectDocuments } = await supabase
     .from('project_documents')
     .select('id, document_type, cloudinary_url, filename, is_gated')
@@ -153,9 +152,6 @@ export default async function ProjectPage({ params }: Props) {
     .order('document_type', { ascending: true })
   const docList = (projectDocuments ?? []) as Record<string, unknown>[]
 
-  // Gated, member-only fields. Read from the base `projects` table, which still
-  // grants SELECT to the authenticated role. Anonymous visitors never fetch
-  // these — and once the anon GRANT is revoked, cannot.
   let roiModelRaw: unknown = null
   let unitPriceListRaw: unknown = null
   let investmentCommentary: string | null = null
@@ -183,10 +179,10 @@ export default async function ProjectPage({ params }: Props) {
   const quickFacts = [
     { label: 'Starting price', value: formatPriceFrom(priceMin) },
     { label: 'Unit types', value: unitTypes },
-    { label: 'Unit sizes', value: unitSizes },
+    { label: 'Sizes', value: unitSizes },
     { label: 'Handover', value: handoverDate },
     { label: 'Ownership', value: ownershipType },
-  ].filter((f) => f.value)
+  ].filter((f): f is { label: string; value: string } => typeof f.value === 'string' && f.value.length > 0)
 
   const listingSchema = {
     '@context': 'https://schema.org',
@@ -195,11 +191,7 @@ export default async function ProjectPage({ params }: Props) {
     description: s('seo_description') ?? hawookIntro?.slice(0, 200),
     url: `https://app.hawook.com/projects/${slug}`,
     image: coverImageUrl,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: area,
-      addressCountry: 'TH',
-    },
+    address: { '@type': 'PostalAddress', addressLocality: area, addressCountry: 'TH' },
   }
 
   const breadcrumbSchema = {
@@ -222,285 +214,411 @@ export default async function ProjectPage({ params }: Props) {
     })),
   } : null
 
-  const waMsg = encodeURIComponent(`Hi Yogi, I’d like to know more about ${projectName}.`)
+  const waMsg = encodeURIComponent(`Hi, I'd like to know more about ${projectName}.`)
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(listingSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      {faqSchema && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-        />
-      )}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listingSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
 
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 pb-24">
-        {/* Header */}
-        <div className="pt-10 pb-6">
-          <div className="flex flex-wrap gap-2 mb-4">
+      <article style={{ maxWidth: 'var(--container)', margin: '0 auto', padding: '0 var(--gutter) var(--space-10)' }}>
+
+        {/* ── Breadcrumb ── */}
+        <nav aria-label="Breadcrumb" style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-5)' }}>
+          <ol style={{ display: 'flex', gap: 'var(--space-3)', listStyle: 'none', margin: 0, padding: 0, fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
+            <li><Link href="/" style={{ color: 'var(--text-tertiary)', textDecoration: 'none' }}>Home</Link></li>
+            <li aria-hidden="true">/</li>
+            <li><Link href="/projects" style={{ color: 'var(--text-tertiary)', textDecoration: 'none' }}>Projects</Link></li>
+            <li aria-hidden="true">/</li>
+            <li style={{ color: 'var(--text-secondary)' }}>{projectName}</li>
+          </ol>
+        </nav>
+
+        {/* ── Page header ── */}
+        <header style={{ paddingBottom: 'var(--space-7)', borderBottom: '1px solid var(--rule)', marginBottom: 'var(--space-7)' }}>
+          {/* Tags row */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: 'var(--space-5)' }}>
             {area && (
-              <span className="text-xs font-medium bg-teal-light text-teal px-3 py-1 rounded-full">
+              <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-label)', fontWeight: 'var(--fw-semibold)', letterSpacing: 'var(--tracking-label)', textTransform: 'uppercase', color: 'var(--text-brand)', background: 'var(--navy-50)', padding: '3px var(--space-4)', borderRadius: 'var(--radius-xs)' }}>
                 {area}
               </span>
             )}
             {constructionStatus && (
-              <span className="text-xs font-medium bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+              <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-label)', fontWeight: 'var(--fw-semibold)', letterSpacing: 'var(--tracking-label)', textTransform: 'uppercase', color: 'var(--text-secondary)', background: 'var(--bg-tint)', padding: '3px var(--space-4)', borderRadius: 'var(--radius-xs)' }}>
                 {constructionStatus}
               </span>
             )}
           </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-medium text-gray-900 mb-2">
-            {projectName}
-          </h1>
-          {developerName && (
-            <p className="text-gray-500 mb-3">by {developerName}</p>
-          )}
-          {hawookBadge && <HawookBadge badge={hawookBadge} />}
-          {lastUpdatedRaw && (
-            <p className="text-xs text-gray-400 mt-2">
-              Data last refreshed:{' '}
-              {new Date(lastUpdatedRaw).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-            </p>
-          )}
-        </div>
 
-        {/* Cover image */}
+          {/* Title + score row */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-7)', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 5vw, var(--text-display-3))', fontWeight: 'var(--fw-semibold)', letterSpacing: 'var(--tracking-display)', lineHeight: 'var(--lh-display)', color: 'var(--text-primary)', margin: '0 0 var(--space-3)' }}>
+                {projectName}
+              </h1>
+              {developerName && (
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-body)', color: 'var(--text-secondary)', margin: 0 }}>
+                  by {developerName}
+                </p>
+              )}
+              {lastUpdatedRaw && (
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: 'var(--space-3)' }}>
+                  Data refreshed{' '}
+                  {new Date(lastUpdatedRaw).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+              )}
+            </div>
+
+            {/* Score panel */}
+            {hawookScore != null && (
+              <div style={{ flexShrink: 0, padding: 'var(--space-6)', background: 'var(--bg-surface)', border: '1px solid var(--rule)', borderRadius: 'var(--radius-md)' }}>
+                <ScoreDisplay
+                  score={hawookScore}
+                  size="lg"
+                  badge
+                  strip
+                  dimensionsLocked
+                  dimensions={[
+                    { label: 'Location', score: 0, weight: 0.20 },
+                    { label: 'Developer', score: 0, weight: 0.20 },
+                    { label: 'Design', score: 0, weight: 0.15 },
+                    { label: 'Value', score: 0, weight: 0.20 },
+                    { label: 'Financials', score: 0, weight: 0.15 },
+                    { label: 'Risk', score: 0, weight: 0.10 },
+                  ]}
+                />
+              </div>
+            )}
+            {!hawookScore && hawookBadge && (
+              <div style={{ flexShrink: 0, padding: 'var(--space-5) var(--space-6)', background: 'var(--bg-surface)', border: '1px solid var(--rule)', borderRadius: 'var(--radius-md)' }}>
+                <div className="hw-label" style={{ marginBottom: 'var(--space-2)' }}>Hawook Score</div>
+                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                  {hawookBadge}
+                </div>
+              </div>
+            )}
+          </div>
+        </header>
+
+        {/* ── Cover image ── */}
         {coverImageUrl && (
-          <div className="aspect-video rounded-lg overflow-hidden mb-8 bg-gray-100">
-            <Image
-              src={coverImageUrl}
-              alt={projectName}
-              width={1200}
-              height={675}
-              className="w-full h-full object-cover"
-              priority
-              placeholder="blur"
-              blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjY3NSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2U1ZTdlYiIvPjwvc3ZnPg=="
-            />
+          <figure style={{ margin: '0 0 var(--space-7)', position: 'relative' }}>
+            <div style={{ aspectRatio: 'var(--ratio-hero)', overflow: 'hidden', borderRadius: 'var(--radius-md)', background: 'var(--bg-tint)' }}>
+              <Image
+                src={coverImageUrl}
+                alt={projectName}
+                width={1200}
+                height={675}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(0.88) contrast(0.96)' }}
+                priority
+                placeholder="blur"
+                blurDataURL={BLUR_PLACEHOLDER}
+              />
+            </div>
+            {isCGI && (
+              <figcaption style={{ marginTop: 'var(--space-3)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
+                Developer render
+              </figcaption>
+            )}
+          </figure>
+        )}
+
+        {/* ── Quick facts ── */}
+        {quickFacts.length > 0 && (
+          <div style={{ marginBottom: 'var(--space-8)' }}>
+            <DataList items={quickFacts} />
           </div>
         )}
 
-        {/* Quick facts */}
-        {quickFacts.length > 0 && (
-          <div className="flex gap-6 overflow-x-auto pb-2 mb-10 border-y border-gray-100 py-4">
-            {quickFacts.map((fact) => (
-              <div key={fact.label} className="shrink-0">
-                <p className="text-xs text-gray-400 mb-0.5">{fact.label}</p>
-                <p className="text-sm font-medium text-gray-900">{fact.value}</p>
-              </div>
+        {/* ── How the score is built ── */}
+        {hawookScore != null && (
+          <section style={{ marginBottom: 'var(--space-10)' }}>
+            <SectionHeader
+              title="How the score is built"
+              note={user
+                ? 'Six weighted dimensions. Hover the strip in the header for the same detail in miniature.'
+                : 'Six weighted dimensions. The structure is public; the values are for signed-in readers.'}
+            />
+            <ScoreBreakdown dimensions={SCORE_DIMENSIONS} locked={!user} columns={2} />
+            {!user && (
+              <p style={{ marginTop: 'var(--space-6)', paddingLeft: 'var(--space-5)', borderLeft: '3px solid var(--rule-brand)', fontSize: 'var(--text-body)', color: 'var(--text-primary)' }}>
+                <Link href="/login" style={{ fontWeight: 'var(--fw-semibold)', color: 'var(--text-brand)', textDecoration: 'none' }}>Sign in</Link> to see the full scoring breakdown. It&apos;s free, and nothing here is behind a payment.
+              </p>
+            )}
+          </section>
+        )}
+
+        {/* ── Hawook intro ── */}
+        {hawookIntro && (
+          <div style={{ marginBottom: 'var(--space-8)', maxWidth: 'var(--measure-prose)' }}>
+            {hawookIntro.split('\n\n').map((para, i) => (
+              <p key={i} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-lead)', lineHeight: 'var(--lh-editorial)', color: 'var(--text-primary)', marginBottom: 'var(--space-6)' }}>
+                {para}
+              </p>
             ))}
           </div>
         )}
 
-        {/* Hawook intro */}
-        {hawookIntro && (
-          <div className="mb-10">
-            <div className="text-gray-700 leading-relaxed">
-              {hawookIntro.split('\n\n').map((para, i) => (
-                <p key={i} className="mb-4 last:mb-0">{para}</p>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Description (markdown) */}
+        {/* ── Description (markdown) ── */}
         {descriptionPublic && (
-          <div className="mb-10">
+          <div className="prose-hawook" style={{ marginBottom: 'var(--space-8)' }}>
             <MarkdownContent content={descriptionPublic} />
           </div>
         )}
 
-        {/* Hawook's Take */}
-        <HawookTake take={hawookTakeText} />
-
-        {/* Design & Layout */}
-        {designCommentary && (
-          <div className="mb-10">
-            <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Design &amp; Layout</h2>
-            <div className="text-gray-700 leading-relaxed">
-              {designCommentary.split('\n\n').map((para, i) => (
-                <p key={i} className="mb-3 last:mb-0">{para}</p>
+        {/* ── Hawook's Take ── */}
+        {hawookTakeText && (
+          <div style={{ marginBottom: 'var(--space-8)' }}>
+            <Callout kind="take">
+              {hawookTakeText.split('\n\n').map((para, i) => (
+                <p key={i}>{para}</p>
               ))}
-            </div>
+            </Callout>
           </div>
         )}
 
-        {/* Location */}
+        {/* ── Design & Layout ── */}
+        {designCommentary && (
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <SectionHeader title="Design and layout" />
+            <div style={{ maxWidth: 'var(--measure-prose)' }}>
+              {designCommentary.split('\n\n').map((para, i) => (
+                <p key={i} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-body-lg)', lineHeight: 'var(--lh-editorial)', color: 'var(--text-primary)', marginBottom: 'var(--space-5)' }}>
+                  {para}
+                </p>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Location ── */}
         {(locationDescription || nearbyLandmarks) && (
-          <div className="mb-10">
-            <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Location</h2>
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <SectionHeader title="Location" />
             {locationDescription && (
-              <p className="text-gray-700 leading-relaxed mb-4">{locationDescription}</p>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-body-lg)', lineHeight: 'var(--lh-editorial)', color: 'var(--text-primary)', marginBottom: 'var(--space-6)', maxWidth: 'var(--measure-prose)' }}>
+                {locationDescription}
+              </p>
             )}
             {nearbyLandmarks && (
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Nearby</p>
-                <ul className="space-y-1">
+              <div style={{ background: 'var(--bg-tint)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-6)', maxWidth: 'var(--measure-narrow)' }}>
+                <div className="hw-label" style={{ marginBottom: 'var(--space-4)' }}>Nearby</div>
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 'var(--space-3)' }}>
                   {nearbyLandmarks.split('\n').filter(Boolean).map((landmark, i) => (
-                    <li key={i} className="text-sm text-gray-600 flex gap-2">
-                      <span className="text-teal">—</span>
+                    <li key={i} style={{ display: 'flex', gap: 'var(--space-3)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
+                      <span aria-hidden="true" style={{ color: 'var(--text-tertiary)', flexShrink: 0 }}>—</span>
                       {landmark.trim()}
                     </li>
                   ))}
                 </ul>
               </div>
             )}
-          </div>
+          </section>
         )}
 
-        {/* Facilities */}
-        {facilities && (
-          <div className="mb-10">
-            <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Facilities</h2>
-            <div className="flex flex-wrap gap-2">
-              {facilities.split(/[,\n]/).filter(Boolean).map((item, i) => (
-                <span key={i} className="text-sm bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md">
-                  {item.trim()}
-                </span>
-              ))}
-            </div>
+        {/* ── Facilities ── */}
+        {(facilities || (Array.isArray(uniqueFeatures) && (uniqueFeatures as string[]).length > 0)) && (
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <SectionHeader title="Facilities" />
+            {facilities && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', marginBottom: (Array.isArray(uniqueFeatures) && (uniqueFeatures as string[]).length > 0) ? 'var(--space-6)' : 0 }}>
+                {facilities.split(/[,\n]/).filter(Boolean).map((item, i) => (
+                  <span
+                    key={i}
+                    style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', background: 'var(--bg-tint)', border: '1px solid var(--rule)', padding: '3px var(--space-4)', borderRadius: 'var(--radius-xs)' }}
+                  >
+                    {item.trim()}
+                  </span>
+                ))}
+              </div>
+            )}
             {Array.isArray(uniqueFeatures) && (uniqueFeatures as string[]).length > 0 && (
-              <div className="mt-4 bg-teal-light rounded-lg p-4">
-                <p className="text-xs font-semibold text-teal uppercase tracking-widest mb-2">Standout features</p>
-                <ul className="space-y-1">
+              <div style={{ background: 'var(--bg-editorial)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-6)', maxWidth: 'var(--measure-narrow)' }}>
+                <div className="hw-label" style={{ color: 'var(--text-accent)', marginBottom: 'var(--space-4)' }}>Standout features</div>
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 'var(--space-3)' }}>
                   {(uniqueFeatures as string[]).map((f, i) => (
-                    <li key={i} className="text-sm text-teal-dark flex gap-2">
-                      <span>✦</span> {f}
+                    <li key={i} style={{ display: 'flex', gap: 'var(--space-3)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
+                      <span aria-hidden="true" style={{ color: 'var(--text-accent)', flexShrink: 0 }}>—</span>
+                      {f}
                     </li>
                   ))}
                 </ul>
               </div>
             )}
-          </div>
+          </section>
         )}
 
-        {/* Public Q&A */}
+        {/* ── Buyer Q&A ── */}
         {publicQA.length > 0 && (
-          <div className="mb-10">
-            <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Buyer Q&amp;A</h2>
-            <div className="space-y-4">
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <SectionHeader title="Buyer Q&A" />
+            <div style={{ display: 'grid', gap: 'var(--space-1)', maxWidth: 'var(--measure-prose)' }}>
               {publicQA.map((qa, i) => (
-                <details key={i} className="border border-gray-100 rounded-lg">
-                  <summary className="p-4 cursor-pointer text-sm font-medium text-gray-900 hover:text-teal transition-colors list-none flex justify-between items-center">
+                <details
+                  key={i}
+                  style={{ borderBottom: '1px solid var(--rule)' }}
+                >
+                  <summary
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-4)', padding: 'var(--space-5) 0', cursor: 'pointer', listStyle: 'none', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-primary)' }}
+                  >
                     {qa.question}
-                    <span className="text-gray-400 ml-2">+</span>
+                    <span aria-hidden="true" style={{ color: 'var(--text-tertiary)', flexShrink: 0, fontWeight: 'var(--fw-regular)' }}>+</span>
                   </summary>
-                  <div className="px-4 pb-4 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
+                  <div style={{ paddingBottom: 'var(--space-5)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', lineHeight: 'var(--lh-editorial)', color: 'var(--text-secondary)' }}>
                     {qa.answer}
                   </div>
                 </details>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Market comparison */}
+        {/* ── Market comparison ── */}
         {Array.isArray(marketComparisonRaw) && (marketComparisonRaw as Record<string, unknown>[]).length > 0 && (
-          <div className="mb-10">
-            <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Market Comparison</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <SectionHeader title="Market comparison" />
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', fontFamily: 'var(--font-sans)' }}>
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-2 pr-4 text-gray-500 font-medium">Project</th>
-                    <th className="text-left py-2 pr-4 text-gray-500 font-medium">Area</th>
-                    <th className="text-left py-2 pr-4 text-gray-500 font-medium">Entry price</th>
-                    <th className="text-left py-2 text-gray-500 font-medium">Notes</th>
+                  <tr style={{ borderBottom: '2px solid var(--rule-strong)' }}>
+                    {['Project', 'Area', 'Entry price', 'Notes'].map((h) => (
+                      <th key={h} style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-5) var(--space-3) 0', fontSize: 'var(--text-label)', fontWeight: 'var(--fw-semibold)', letterSpacing: 'var(--tracking-label)', textTransform: 'uppercase', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                        {h}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {(marketComparisonRaw as Record<string, unknown>[]).map((row, i) => (
-                    <tr key={i} className="border-b border-gray-100">
-                      <td className="py-2 pr-4 font-medium text-gray-900">{String(row.project_name ?? row.name ?? '')}</td>
-                      <td className="py-2 pr-4 text-gray-600">{String(row.area ?? '')}</td>
-                      <td className="py-2 pr-4 text-gray-600">{String(row.entry_price ?? row.price ?? '')}</td>
-                      <td className="py-2 text-gray-500">{String(row.notes ?? row.positioning_notes ?? '')}</td>
+                    <tr key={i} style={{ borderBottom: '1px solid var(--rule)' }}>
+                      <td style={{ padding: 'var(--space-4) var(--space-5) var(--space-4) 0', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-primary)' }}>{String(row.project_name ?? row.name ?? '')}</td>
+                      <td style={{ padding: 'var(--space-4) var(--space-5) var(--space-4) 0', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>{String(row.area ?? '')}</td>
+                      <td className="hw-num" style={{ padding: 'var(--space-4) var(--space-5) var(--space-4) 0', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>{String(row.entry_price ?? row.price ?? '')}</td>
+                      <td style={{ padding: 'var(--space-4) 0', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>{String(row.notes ?? row.positioning_notes ?? '')}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </div>
+            <p style={{ marginTop: 'var(--space-4)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
+              Published prices at time of research. Hawook does not mark up prices or earn commission on unit sales.
+            </p>
+          </section>
         )}
 
-        {/* Hawook Verdict */}
-        {verdict && (
-          <div className="mb-10">
-            <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Hawook Verdict</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {verdict.buyIf && (
-                <div className="bg-teal-light rounded-lg p-4">
-                  <p className="text-xs font-semibold text-teal uppercase tracking-widest mb-2">Buy if</p>
-                  <p className="text-sm text-gray-700 leading-relaxed">{verdict.buyIf}</p>
-                </div>
-              )}
-              {verdict.skipIf && (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Skip if</p>
-                  <p className="text-sm text-gray-700 leading-relaxed">{verdict.skipIf}</p>
-                </div>
-              )}
-              {verdict.watchFor && (
-                <div className="border border-amber-100 bg-amber-50 rounded-lg p-4">
-                  <p className="text-xs font-semibold text-amber-600 uppercase tracking-widest mb-2">Watch for</p>
-                  <p className="text-sm text-gray-700 leading-relaxed">{verdict.watchFor}</p>
-                </div>
-              )}
+        {/* ── Gallery ── */}
+        {galleryUrls.length > 0 && (
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <SectionHeader title="Gallery" />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
+              {galleryUrls.map((url, i) => {
+                const isCGIGallery = galleryTypes[i] === 'cgi' || galleryTypes[i] === 'render'
+                return (
+                  <figure key={i} style={{ margin: 0 }}>
+                    <div style={{ aspectRatio: 'var(--ratio-gallery)', overflow: 'hidden', borderRadius: 'var(--radius-md)', background: 'var(--bg-tint)' }}>
+                      <Image
+                        src={url}
+                        alt={`${projectName} — image ${i + 1}`}
+                        width={600}
+                        height={400}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(0.88) contrast(0.96)' }}
+                        placeholder="blur"
+                        blurDataURL={BLUR_PLACEHOLDER}
+                      />
+                    </div>
+                    {isCGIGallery && (
+                      <figcaption style={{ marginTop: 'var(--space-2)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
+                        Developer render
+                      </figcaption>
+                    )}
+                  </figure>
+                )
+              })}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Developer */}
-        {developerName && (
-          <div className="mb-10 border-t border-gray-100 pt-8">
-            <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">About {developerName}</h2>
-            {developerTrackRecord && (
-              <p className="text-gray-600 leading-relaxed mb-3">{developerTrackRecord}</p>
+        {/* ── Verdict ── */}
+        {verdict && (verdict.buyIf || verdict.skipIf || verdict.watchFor) && (
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <SectionHeader title="Verdict &amp; what we&apos;d flag" />
+            {(verdict.buyIf || verdict.skipIf) && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-8)', marginBottom: verdict.watchFor ? 'var(--space-8)' : 0 }}>
+                {verdict.buyIf && (
+                  <Callout kind="verdict">
+                    <p>{verdict.buyIf}</p>
+                  </Callout>
+                )}
+                {verdict.skipIf && (
+                  <Callout kind="restraint">
+                    <p>{verdict.skipIf}</p>
+                  </Callout>
+                )}
+              </div>
             )}
-            {developerAwards && (() => {
-              const items = developerAwards.split(';').map(s => s.trim()).filter(Boolean)
-              return items.length > 1 ? (
-                <ul className="space-y-1 mt-2">
-                  {items.map((award, i) => (
-                    <li key={i} className="text-sm text-gray-500 flex gap-2">
-                      <span className="text-teal shrink-0">—</span>
-                      <span className="italic">{award}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-gray-500 italic">{developerAwards}</p>
-              )
-            })()}
-          </div>
+            {verdict.watchFor && (
+              <Callout kind="flag">
+                <p>{verdict.watchFor}</p>
+              </Callout>
+            )}
+          </section>
         )}
 
-        {/* Documents */}
+        {/* ── Developer ── */}
+        {developerName && (
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <SectionHeader title={`About ${developerName}`} />
+            <div style={{ maxWidth: 'var(--measure-prose)' }}>
+              {developerTrackRecord && (
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-body-lg)', lineHeight: 'var(--lh-editorial)', color: 'var(--text-primary)', marginBottom: 'var(--space-5)' }}>
+                  {developerTrackRecord}
+                </p>
+              )}
+              {developerAwards && (() => {
+                const items = developerAwards.split(';').map((s: string) => s.trim()).filter(Boolean)
+                return items.length > 1 ? (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 'var(--space-3)' }}>
+                    {items.map((award: string, i: number) => (
+                      <li key={i} style={{ display: 'flex', gap: 'var(--space-3)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                        <span aria-hidden="true" style={{ flexShrink: 0 }}>—</span>
+                        <em>{award}</em>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', fontStyle: 'italic' }}>{developerAwards}</p>
+                )
+              })()}
+            </div>
+          </section>
+        )}
+
+        {/* ── Documents ── */}
         {docList.length > 0 && (
-          <div className="mb-10 border-t border-gray-100 pt-8">
-            <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Downloads</h2>
-            <ul className="space-y-2">
+          <section style={{ marginBottom: 'var(--space-8)' }}>
+            <SectionHeader title="Downloads" />
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 'var(--space-1)' }}>
               {docList.map(doc => {
                 const label = DOC_TYPE_LABELS[doc.document_type as string] ?? String(doc.document_type)
                 const isGated = doc.is_gated as boolean
                 return (
-                  <li key={doc.id as string} className="flex items-center gap-3 bg-gray-50 rounded-lg px-4 py-3">
-                    <span className="text-xl shrink-0">📄</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{(doc.filename as string) ?? label}</p>
-                      <p className="text-xs text-gray-400">{label}</p>
+                  <li
+                    key={doc.id as string}
+                    style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-5)', padding: 'var(--space-5) 0', borderBottom: '1px solid var(--rule)' }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-primary)', margin: 0 }}>
+                        {(doc.filename as string) ?? label}
+                      </p>
+                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', margin: 0, marginTop: 'var(--space-1)' }}>
+                        {label}
+                      </p>
                     </div>
                     {isGated && !user ? (
                       <Link
                         href="/login"
-                        className="text-xs text-teal hover:underline shrink-0"
+                        style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-brand)', textDecoration: 'underline', flexShrink: 0 }}
                       >
                         Sign in to download
                       </Link>
@@ -509,7 +627,7 @@ export default async function ProjectPage({ params }: Props) {
                         href={doc.cloudinary_url as string}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-teal hover:underline shrink-0"
+                        style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-brand)', textDecoration: 'underline', flexShrink: 0 }}
                       >
                         Download
                       </a>
@@ -518,10 +636,10 @@ export default async function ProjectPage({ params }: Props) {
                 )
               })}
             </ul>
-          </div>
+          </section>
         )}
 
-        {/* Gated section */}
+        {/* ── Gated content ── */}
         {user ? (
           <>
             <GatedContentTracker projectSlug={slug} />
@@ -536,85 +654,37 @@ export default async function ProjectPage({ params }: Props) {
             />
           </>
         ) : (
-          <div className="mb-10 relative">
-            {/* Blurred placeholder — purely visual; no gated data is fetched for anonymous users */}
-            <div className="blur-sm pointer-events-none select-none" aria-hidden="true">
-              <div className="space-y-6">
-                <div>
-                  <div className="h-5 bg-gray-200 rounded w-40 mb-4" />
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-gray-200">
-                          {['Unit type', 'Size', 'Floor', 'Price', '฿/sqm'].map((h) => (
-                            <th key={h} className="text-left py-2 pr-4 text-gray-400 font-medium">{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[1, 2, 3].map((i) => (
-                          <tr key={i} className="border-b border-gray-100">
-                            {[1, 2, 3, 4, 5].map((j) => (
-                              <td key={j} className="py-2 pr-4">
-                                <div className="h-4 bg-gray-200 rounded" style={{ width: `${60 + j * 10}%` }} />
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="border border-gray-200 rounded-lg p-5">
-                      <div className="h-4 bg-gray-200 rounded w-24 mb-3" />
-                      <div className="space-y-2">
-                        {[1, 2, 3].map((j) => (
-                          <div key={j} className="flex justify-between">
-                            <div className="h-3 bg-gray-200 rounded w-28" />
-                            <div className="h-3 bg-gray-200 rounded w-16" />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          <section style={{ marginBottom: 'var(--space-8)', padding: 'var(--space-8)', background: 'var(--bg-subtle-brand)', borderRadius: 'var(--radius-md)' }}>
+            <div style={{ maxWidth: 'var(--measure-narrow)' }}>
+              <div className="hw-label" style={{ color: 'var(--text-brand)', marginBottom: 'var(--space-4)' }}>
+                Members only
+              </div>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-title)', fontWeight: 'var(--fw-semibold)', lineHeight: 'var(--lh-title)', color: 'var(--text-primary)', margin: '0 0 var(--space-4)' }}>
+                Full price list, ROI model, price per sqm, and private buyer Q&A
+              </p>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-body)', lineHeight: 'var(--lh-body)', color: 'var(--text-secondary)', margin: '0 0 var(--space-6)' }}>
+                Sign in to see the complete scoring breakdown, download floor plans, and access per-unit pricing and yield analysis — free with a Hawook account.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
+                <Link
+                  href="/signup"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'var(--action-primary)', color: 'var(--text-on-inverse)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--radius-md)', textDecoration: 'none', transition: `background var(--dur-base) var(--ease-out)` }}
+                >
+                  Create free account
+                </Link>
+                <Link
+                  href="/login"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--action-secondary-border)', color: 'var(--text-brand)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--radius-md)', textDecoration: 'none', background: 'transparent', transition: `background var(--dur-base) var(--ease-out)` }}
+                >
+                  Sign in
+                </Link>
               </div>
             </div>
-
-            {/* Unlock overlay */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 rounded-xl px-6 py-8">
-              <div className="text-center max-w-sm">
-                <div className="w-10 h-10 bg-teal-light rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-teal">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                  </svg>
-                </div>
-                <h3 className="font-serif text-lg font-medium text-gray-900 mb-2">Sign up to view full details</h3>
-                <p className="text-sm text-gray-500 mb-5">Floor plans, full price list, ROI model, price per sqm analysis, and private buyer Q&amp;A — free with a Hawook account.</p>
-                <div className="flex flex-col gap-2">
-                  <Link
-                    href="/signup"
-                    className="inline-flex items-center justify-center bg-teal text-white font-medium px-6 py-2.5 rounded-md hover:bg-teal-dark transition-colors text-sm"
-                  >
-                    Sign up free
-                  </Link>
-                  <Link
-                    href="/login"
-                    className="inline-flex items-center justify-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                  >
-                    Already have an account? Sign in
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
+          </section>
         )}
 
-        {/* Lead capture form */}
-        <div className="mb-10">
+        {/* ── Lead capture ── */}
+        <div style={{ marginBottom: 'var(--space-8)' }}>
           <LeadForm
             projectSlug={slug}
             projectName={projectName}
@@ -623,16 +693,16 @@ export default async function ProjectPage({ params }: Props) {
           />
         </div>
 
-        {/* Follow + WhatsApp */}
-        <div className="border-t border-gray-100 pt-8">
-          <div className="flex flex-col sm:flex-row gap-3">
+        {/* ── Follow + WhatsApp ── */}
+        <div style={{ borderTop: '1px solid var(--rule)', paddingTop: 'var(--space-7)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
             <a
               href={`https://wa.me/66805100129?text=${waMsg}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 bg-[#25D366] text-white font-medium px-6 py-3 rounded-md hover:opacity-90 transition-opacity"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-3)', background: 'var(--action-primary)', color: 'var(--text-on-inverse)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', padding: 'var(--space-4) var(--space-6)', borderRadius: 'var(--radius-md)', textDecoration: 'none', transition: `background var(--dur-base) var(--ease-out)` }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
               </svg>
               WhatsApp us
@@ -640,6 +710,7 @@ export default async function ProjectPage({ params }: Props) {
             {user && <FollowButton userId={user.id} projectId={id} />}
           </div>
         </div>
+
       </article>
     </>
   )
@@ -662,129 +733,138 @@ function GatedContent({ unitPriceList: upl, roiModel: rm, investmentCommentary, 
   ) ?? null
 
   return (
-    <div className="mb-10 space-y-10">
+    <div style={{ marginBottom: 'var(--space-8)', display: 'grid', gap: 'var(--space-8)' }}>
+
       {/* Unit price list */}
       {unitPriceList && unitPriceList.length > 0 && (
-        <div>
-          <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Full Price List</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+        <section>
+          <SectionHeader title="Full price list" />
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', fontFamily: 'var(--font-sans)' }}>
               <thead>
-                <tr className="border-b border-gray-200">
+                <tr style={{ borderBottom: '2px solid var(--rule-strong)' }}>
                   {['Unit type', 'Size', 'Floor', 'View', 'Price', '฿/sqm', 'Status'].map((h) => (
-                    <th key={h} className="text-left py-2 pr-4 text-gray-500 font-medium whitespace-nowrap">{h}</th>
+                    <th key={h} style={{ textAlign: 'left', padding: 'var(--space-3) var(--space-5) var(--space-3) 0', fontSize: 'var(--text-label)', fontWeight: 'var(--fw-semibold)', letterSpacing: 'var(--tracking-label)', textTransform: 'uppercase', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                      {h}
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {unitPriceList.map((unit, i) => (
-                  <tr key={i} className="border-b border-gray-100">
-                    <td className="py-2 pr-4 font-medium text-gray-900">{String(unit.unit_type ?? unit.type ?? '')}</td>
-                    <td className="py-2 pr-4 text-gray-600">{String(unit.size ?? unit.sqm ?? '')}</td>
-                    <td className="py-2 pr-4 text-gray-600">{String(unit.floor ?? '')}</td>
-                    <td className="py-2 pr-4 text-gray-600">{String(unit.view ?? '')}</td>
-                    <td className="py-2 pr-4 text-gray-900 font-medium">{String(unit.price ?? '')}</td>
-                    <td className="py-2 pr-4 text-gray-600">{String(unit.price_per_sqm ?? unit.psm ?? '')}</td>
-                    <td className="py-2 text-gray-500">{String(unit.availability ?? unit.status ?? '')}</td>
+                  <tr key={i} style={{ borderBottom: '1px solid var(--rule)' }}>
+                    <td style={{ padding: 'var(--space-4) var(--space-5) var(--space-4) 0', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-primary)' }}>{String(unit.unit_type ?? unit.type ?? '')}</td>
+                    <td className="hw-num" style={{ padding: 'var(--space-4) var(--space-5) var(--space-4) 0', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>{String(unit.size ?? unit.sqm ?? '')}</td>
+                    <td className="hw-num" style={{ padding: 'var(--space-4) var(--space-5) var(--space-4) 0', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>{String(unit.floor ?? '')}</td>
+                    <td style={{ padding: 'var(--space-4) var(--space-5) var(--space-4) 0', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>{String(unit.view ?? '')}</td>
+                    <td className="hw-num" style={{ padding: 'var(--space-4) var(--space-5) var(--space-4) 0', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-primary)' }}>{String(unit.price ?? '')}</td>
+                    <td className="hw-num" style={{ padding: 'var(--space-4) var(--space-5) var(--space-4) 0', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>{String(unit.price_per_sqm ?? unit.psm ?? '')}</td>
+                    <td style={{ padding: 'var(--space-4) 0', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>{String(unit.availability ?? unit.status ?? '')}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
       )}
 
       {/* ROI model */}
       {roiModel && roiModel.length > 0 && (
-        <div>
-          <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">ROI Model</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <section>
+          <SectionHeader title="ROI model" note="Based on developer-stated occupancy rates. Hawook has not independently verified these projections." />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
             {roiModel.map((item, i) => (
-              <div key={i} className="border border-gray-200 rounded-lg p-5">
-                <p className="font-medium text-gray-900 mb-3">{String(item.unit_type ?? item.type ?? `Unit ${i + 1}`)}</p>
-                <dl className="space-y-1.5 text-sm">
+              <div key={i} style={{ border: '1px solid var(--rule)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-6)' }}>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-primary)', margin: '0 0 var(--space-5)' }}>
+                  {String(item.unit_type ?? item.type ?? `Unit ${i + 1}`)}
+                </p>
+                <dl style={{ display: 'grid', gap: 'var(--space-3)' }}>
                   {[
                     ['Purchase price', item.purchase_price ?? item.price],
                     ['Gross yield', item.gross_yield],
                     ['Net yield', item.net_yield],
                     ['Annual net income', item.annual_net_income ?? item.net_income],
                   ].filter(([, v]) => v).map(([label, value]) => (
-                    <div key={String(label)} className="flex justify-between gap-4">
-                      <dt className="text-gray-500">{String(label)}</dt>
-                      <dd className="font-medium text-gray-900">{String(value)}</dd>
+                    <div key={String(label)} style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-4)' }}>
+                      <dt style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>{String(label)}</dt>
+                      <dd className="hw-num" style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-primary)', margin: 0 }}>{String(value)}</dd>
                     </div>
                   ))}
                 </dl>
                 {item.assumptions != null && (
-                  <p className="mt-3 text-xs text-gray-400 italic">{String(item.assumptions)}</p>
+                  <p style={{ marginTop: 'var(--space-4)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>{String(item.assumptions)}</p>
                 )}
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Investment commentary */}
       {investmentCommentary && (
-        <div>
-          <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Investment Commentary</h2>
-          <div className="text-gray-700 leading-relaxed">
+        <section>
+          <SectionHeader title="Investment commentary" />
+          <div style={{ maxWidth: 'var(--measure-prose)' }}>
             {investmentCommentary.split('\n\n').map((para, i) => (
-              <p key={i} className="mb-3 last:mb-0">{para}</p>
+              <p key={i} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-body-lg)', lineHeight: 'var(--lh-editorial)', color: 'var(--text-primary)', marginBottom: 'var(--space-5)' }}>
+                {para}
+              </p>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Private Q&A */}
       {privateQA.length > 0 && (
-        <div>
-          <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Private Buyer Q&amp;A</h2>
-          <div className="space-y-4">
+        <section>
+          <SectionHeader title="Private buyer Q&A" />
+          <div style={{ display: 'grid', gap: 'var(--space-1)', maxWidth: 'var(--measure-prose)' }}>
             {privateQA.map((qa, i) => (
-              <details key={i} className="border border-gray-100 rounded-lg">
-                <summary className="p-4 cursor-pointer text-sm font-medium text-gray-900 hover:text-teal transition-colors list-none flex justify-between items-center">
+              <details key={i} style={{ borderBottom: '1px solid var(--rule)' }}>
+                <summary style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-4)', padding: 'var(--space-5) 0', cursor: 'pointer', listStyle: 'none', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-primary)' }}>
                   {qa.question}
-                  <span className="text-gray-400 ml-2">+</span>
+                  <span aria-hidden="true" style={{ color: 'var(--text-tertiary)', flexShrink: 0, fontWeight: 'var(--fw-regular)' }}>+</span>
                 </summary>
-                <div className="px-4 pb-4 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
+                <div style={{ paddingBottom: 'var(--space-5)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', lineHeight: 'var(--lh-editorial)', color: 'var(--text-secondary)' }}>
                   {qa.answer}
                 </div>
               </details>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {/* CAM & sinking fund */}
       {(camFee || sinkingFund) && (
-        <div>
-          <h2 className="font-serif text-xl font-medium text-gray-900 mb-4">Ownership Costs</h2>
-          <div className="flex gap-6 flex-wrap">
+        <section>
+          <SectionHeader title="Ownership costs" />
+          <div style={{ display: 'flex', gap: 'var(--space-8)', flexWrap: 'wrap' }}>
             {camFee && (
               <div>
-                <p className="text-xs text-gray-400 mb-0.5">CAM fee</p>
-                <p className="font-medium text-gray-900">฿{camFee}/sqm/month</p>
+                <div className="hw-label" style={{ marginBottom: 'var(--space-2)' }}>CAM fee</div>
+                <p className="hw-num" style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-body)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-primary)', margin: 0 }}>THB {camFee}/sqm/month</p>
               </div>
             )}
             {sinkingFund && (
               <div>
-                <p className="text-xs text-gray-400 mb-0.5">Sinking fund (one-time)</p>
-                <p className="font-medium text-gray-900">฿{sinkingFund}/sqm</p>
+                <div className="hw-label" style={{ marginBottom: 'var(--space-2)' }}>Sinking fund (one-time)</div>
+                <p className="hw-num" style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-body)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-primary)', margin: 0 }}>THB {sinkingFund}/sqm</p>
               </div>
             )}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Foreign quota */}
       {foreignQuotaAvailable !== null && (
-        <div>
-          <h2 className="font-serif text-xl font-medium text-gray-900 mb-2">Foreign Quota</h2>
-          <p className="text-sm text-gray-600">
-            {foreignQuotaAvailable ? '✓ Foreign freehold quota available' : '✗ No foreign freehold quota — leasehold or Thai quota only'}
+        <section>
+          <SectionHeader title="Foreign quota" />
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-body)', color: 'var(--text-secondary)', margin: 0 }}>
+            {foreignQuotaAvailable
+              ? 'Foreign freehold quota available on this project.'
+              : 'No foreign freehold quota available — leasehold or Thai quota only.'}
           </p>
-        </div>
+        </section>
       )}
     </div>
   )
