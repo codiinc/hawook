@@ -1,14 +1,14 @@
 # HAWOOK — PROJECT STATUS
 
 **Version:** v1 — current state snapshot
-**Last updated:** 25 June 2026 (Content Ops v1.2 column type discipline formalised)
+**Last updated:** 19 September 2026 (Design System rollout complete — all pages migrated)
 **Purpose:** If this chat is lost or a new conversation starts, this document brings any AI assistant (or human) up to current state in 5 minutes of reading.
 
 ---
 
 ## ONE-LINE STATUS
 
-**Tier 2 Phase 1 COMPLETE + Polish Session 1 COMPLETE.** All platform foundations and polish tasks shipped. One external blocker: Resend DNS verification (Yogi). Favicon PNGs (Task 14) need external image generation. Phase 2 (Yogi's Claude + Supabase MCP) is next. Phase 2A first new_record proposal approved: The Title Cielo Rawai (18 June 2026).
+**Tier 2 Phase 1 COMPLETE + Polish Session 1 COMPLETE + Design System rollout COMPLETE.** All platform foundations, polish tasks, and full Hawook DS migration shipped (19 Sep 2026, PR #1). Carly editorial schema live (authors table, bylines on articles). External blockers remain: Resend DNS (Yogi), `app.hawook.com` CNAME (Yogi). Next: DS polish pass + Phase 2 brief (Yogi's Claude + Supabase MCP).
 
 ---
 
@@ -244,6 +244,16 @@ Admin UI uses service-role client (`lib/supabase/admin.ts`) for all reads and wr
 | Build `/areas` index page | ✅ `app/areas/page.tsx` — two area cards with live project counts from `projects_public`, editorial intro, "Other areas" note, WhatsApp CTA. Hard-coded areas for v1. |
 | Update Nav "Areas" link | ✅ `components/Nav.tsx` — desktop and mobile both now point to `/areas`. |
 | Hero images for area cards | ⏳ Placeholder gradient in both cards. Needs: Nai Harn Beach photo (Rawai & Nai Harn card) and Laguna/Layan beach shot (Bang Tao card). Brand asset task — upload to Cloudinary and wire into `/areas/page.tsx`. |
+
+### Design System rollout — COMPLETE (19 September 2026)
+
+All pages migrated to Hawook Design System. Squash-merged as PR #1 to main at commit `58f5718`.
+
+**Batch 1 (committed earlier):** Nav, Footer, ProjectCard, homepage (`/`), projects listing (`/projects`), project detail page v2 (`/projects/[slug]`), ArticleRenderer.
+
+**Batch 2 (committed 19 Sep 2026):** ArticleCard, articles listing (`/articles`), areas index (`/areas`), Rawai & Nai Harn (`/areas/rawai-nai-harn`), Bang Tao (`/areas/bang-tao`), About (`/about`), Login (`/login`), Signup (`/signup`), Dashboard (`/dashboard`).
+
+**Also shipped:** Carly editorial schema — `public.authors` table with 6 seed authors, `byline_slug` + `carly_notes` on `blog_articles`, `content_pipeline_feedback` table, article byline rendering in `ArticleRenderer`.
 
 ### Agent Referral Program — Strategic backlog
 
