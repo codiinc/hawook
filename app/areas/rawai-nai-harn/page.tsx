@@ -86,43 +86,40 @@ export default async function RawaiNaiHarnPage() {
   const projectList = (projects ?? []) as Project[]
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-      {/* Editorial content */}
-      <div className="max-w-2xl">
+    <div style={{ maxWidth: 'var(--container)', margin: '0 auto', padding: 'var(--space-9) var(--gutter)' }}>
+      <div style={{ maxWidth: 'var(--container-narrow)' }}>
         <MarkdownContent content={editorialContent} />
       </div>
 
-      {/* Project grid */}
-      <div className="mt-16">
-        <h2 className="font-serif text-2xl font-medium text-gray-900 mb-6">
+      <div style={{ marginTop: 'var(--space-10)' }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display-4)', fontWeight: 'var(--fw-medium)', color: 'var(--text-brand)', margin: '0 0 var(--space-7)' }}>
           Our Rawai &amp; Nai Harn coverage
         </h2>
         {projectList.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projectList.map(p => (
-              <ProjectCard key={p.id} project={p} />
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--space-6)' }}>
+            {projectList.map(p => <ProjectCard key={p.id} project={p} />)}
           </div>
         ) : (
-          <p className="text-gray-500 text-sm">
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>
             No published projects yet — check back soon.
           </p>
         )}
       </div>
 
-      {/* WhatsApp CTA */}
-      <div className="mt-16 bg-cream rounded-xl border border-gray-200 p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6">
-        <div className="flex-1">
-          <p className="font-serif text-xl font-medium text-gray-900 mb-1">Talk to us about this area</p>
-          <p className="text-gray-600 text-sm leading-relaxed">
-            Not sure which projects suit your criteria? Message Yogi on WhatsApp — we know every active development in Rawai and Nai Harn and can point you in the right direction in minutes.
+      <div style={{ marginTop: 'var(--space-10)', background: 'var(--bg-inverse)', borderRadius: 'var(--radius-sm)', padding: 'var(--space-8)', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', alignItems: 'flex-start' }} className="sm:flex-row sm:items-center">
+        <div style={{ flex: 1 }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-title)', fontWeight: 'var(--fw-medium)', color: 'var(--text-on-inverse)', margin: '0 0 var(--space-3)' }}>
+            Talk to us about this area
+          </p>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-on-inverse-muted)', lineHeight: 'var(--lh-editorial)', margin: 0 }}>
+            Not sure which projects suit your criteria? We know every active development in Rawai and Nai Harn and can point you in the right direction in minutes.
           </p>
         </div>
         <Link
           href={`https://wa.me/66805100129?text=${waMsg}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="shrink-0 text-sm font-medium bg-teal text-white px-5 py-3 rounded-md hover:opacity-90 transition-opacity whitespace-nowrap"
+          style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-brand)', background: 'var(--bg-surface)', padding: '10px 20px', borderRadius: 'var(--radius-md)', textDecoration: 'none', whiteSpace: 'nowrap' }}
         >
           WhatsApp us
         </Link>

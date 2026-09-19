@@ -47,8 +47,6 @@ Hawook is a Thai-registered brokerage based in Phuket. We're a small team — th
 
 Codi Mansbridge founded Hawook in 2025 after spending years watching foreign buyers make property decisions with poor information. The starting principle was simple: buyers were paying premium prices but getting amateur-hour advice, and the platforms were optimized for traffic rather than outcomes.
 
-Yogi is Hawook's operations lead, based in Indonesia, who handles buyer follow-up, content updates, and the daily work of keeping the platform's data accurate. If you submit an enquiry, Yogi is most likely the person responding within the hour during Phuket business hours.
-
 We're currently focused on Rawai and Nai Harn in southern Phuket — the area we know best. We're expanding to Bang Tao next, then progressively across the island as we can do each area justice. We'd rather review 50 projects well than 500 projects superficially.
 
 ## How we make money
@@ -72,7 +70,7 @@ Business hours: 09:00–18:00 Phuket time, Monday to Saturday
 
 export default function AboutPage() {
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
+    <div style={{ maxWidth: 'var(--container-narrow)', margin: '0 auto', padding: 'var(--space-9) var(--gutter)' }}>
       <MarkdownContent content={content} />
     </div>
   )

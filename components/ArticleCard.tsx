@@ -40,9 +40,17 @@ function preview(body: string | null): string {
 
 export default function ArticleCard({ article, href, showTypeBadge = false }: Props) {
   return (
-    <Link href={href} className="group block bg-cream rounded-lg overflow-hidden border border-gray-100 hover:border-teal/30 transition-colors">
+    <Link href={href} className="group" style={{
+      display: 'block',
+      background: 'var(--bg-surface)',
+      borderRadius: 'var(--radius-sm)',
+      overflow: 'hidden',
+      border: '1px solid var(--rule)',
+      textDecoration: 'none',
+      boxShadow: 'var(--shadow-lift)',
+    }}>
       {article.hero_image_url && (
-        <div className="aspect-[16/7] bg-gray-100 relative overflow-hidden">
+        <div style={{ aspectRatio: '16/7', background: 'var(--bg-tint)', position: 'relative', overflow: 'hidden' }}>
           <Image
             src={article.hero_image_url}
             alt={article.title}
@@ -54,25 +62,66 @@ export default function ArticleCard({ article, href, showTypeBadge = false }: Pr
           />
         </div>
       )}
-      <div className="p-5">
-        <div className="flex items-center gap-2 mb-2">
+      <div style={{ padding: 'var(--space-6)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
           {showTypeBadge && (
-            <span className="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+            <span style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-label)',
+              fontWeight: 'var(--fw-bold)',
+              letterSpacing: 'var(--tracking-label)',
+              textTransform: 'uppercase',
+              color: 'var(--text-brand)',
+              background: 'var(--bg-subtle-brand)',
+              padding: '3px 8px',
+              borderRadius: 'var(--radius-xs)',
+            }}>
               {TYPE_LABELS[article.article_type] ?? article.article_type}
             </span>
           )}
           {article.published_at && (
-            <span className="text-xs text-gray-400">{fmtDate(article.published_at)}</span>
+            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
+              {fmtDate(article.published_at)}
+            </span>
           )}
         </div>
-        <h3 className="font-serif text-lg font-medium text-gray-900 leading-snug group-hover:text-teal transition-colors mb-2">
+        <h3 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--text-lead)',
+          fontWeight: 'var(--fw-medium)',
+          color: 'var(--text-brand)',
+          lineHeight: 'var(--lh-title)',
+          margin: '0 0 var(--space-3)',
+        }}>
           {article.title}
         </h3>
-        <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{preview(article.body_mdx)}</p>
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'var(--text-sm)',
+          color: 'var(--text-secondary)',
+          lineHeight: 'var(--lh-editorial)',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical' as const,
+          overflow: 'hidden',
+          margin: 0,
+        }}>
+          {preview(article.body_mdx)}
+        </p>
         {(article.tags ?? []).length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1">
+          <div style={{ marginTop: 'var(--space-4)', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
             {(article.tags ?? []).slice(0, 4).map(tag => (
-              <span key={tag} className="text-xs text-teal bg-teal-light px-2 py-0.5 rounded">{tag}</span>
+              <span key={tag} style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-xs)',
+                fontWeight: 'var(--fw-medium)',
+                color: 'var(--text-brand)',
+                background: 'var(--bg-subtle-brand)',
+                padding: '2px 8px',
+                borderRadius: 'var(--radius-xs)',
+              }}>
+                {tag}
+              </span>
             ))}
           </div>
         )}

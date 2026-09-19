@@ -13,6 +13,29 @@ export default function SignupPage() {
   )
 }
 
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  border: '1px solid var(--rule-strong)',
+  borderRadius: 'var(--radius-md)',
+  padding: '10px 12px',
+  fontFamily: 'var(--font-sans)',
+  fontSize: 'var(--text-sm)',
+  color: 'var(--text-primary)',
+  background: 'var(--bg-surface)',
+  outline: 'none',
+  boxSizing: 'border-box',
+}
+
+const cardStyle: React.CSSProperties = {
+  background: 'var(--bg-surface)',
+  borderRadius: 'var(--radius-sm)',
+  border: '1px solid var(--rule)',
+  padding: 'var(--space-8)',
+  maxWidth: 400,
+  width: '100%',
+  boxShadow: 'var(--shadow-lift)',
+}
+
 function SignupForm() {
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
@@ -26,7 +49,6 @@ function SignupForm() {
     e.preventDefault()
     setError('')
     setLoading(true)
-
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -34,25 +56,21 @@ function SignupForm() {
         emailRedirectTo: `${location.origin}/auth/callback?next=${searchParams.get('redirectTo') ?? '/projects'}`,
       },
     })
-
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-      return
-    }
-
+    if (error) { setError(error.message); setLoading(false); return }
     setSuccess(true)
     setLoading(false)
   }
 
   if (success) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center px-4">
-        <div className="bg-white rounded-xl border border-gray-100 p-8 max-w-md w-full text-center">
-          <div className="text-4xl mb-4">✉️</div>
-          <h1 className="font-serif text-2xl font-medium text-gray-900 mb-3">Check your email</h1>
-          <p className="text-gray-600 text-sm">
-            We&apos;ve sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.
+      <div style={{ minHeight: '100vh', background: 'var(--bg-page)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-5)' }}>
+        <div style={{ ...cardStyle, textAlign: 'center' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-5)' }}>✉️</div>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display-4)', fontWeight: 'var(--fw-medium)', color: 'var(--text-brand)', margin: '0 0 var(--space-4)' }}>
+            Check your email
+          </h1>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-editorial)', margin: 0 }}>
+            We&apos;ve sent a confirmation link to <strong style={{ color: 'var(--text-primary)' }}>{email}</strong>. Click it to activate your account.
           </p>
         </div>
       </div>
@@ -60,60 +78,51 @@ function SignupForm() {
   }
 
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center px-4">
-      <div className="bg-white rounded-xl border border-gray-100 p-8 max-w-md w-full">
-        <div className="mb-8">
-          <Link href="/" className="font-serif text-xl font-semibold text-gray-900">Hawook</Link>
-          <h1 className="font-serif text-2xl font-medium text-gray-900 mt-4 mb-1">Create free account</h1>
-          <p className="text-sm text-gray-500">Access full pricing, ROI models, and private Q&A.</p>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-page)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-5)' }}>
+      <div style={cardStyle}>
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <Link href="/" style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-title)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-brand)', textDecoration: 'none' }}>
+            Hawook
+          </Link>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display-4)', fontWeight: 'var(--fw-medium)', color: 'var(--text-brand)', margin: 'var(--space-5) 0 var(--space-2)' }}>
+            Create free account
+          </h1>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0 }}>
+            Access full pricing, ROI models, and private Q&amp;A.
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal"
-              placeholder="you@example.com"
-            />
+            <label style={{ display: 'block', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-medium)', color: 'var(--text-primary)', marginBottom: 6 }}>
+              Email
+            </label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" placeholder="you@example.com" style={inputStyle} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="new-password"
-              minLength={6}
-              className="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal"
-              placeholder="Min. 6 characters"
-            />
+            <label style={{ display: 'block', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-medium)', color: 'var(--text-primary)', marginBottom: 6 }}>
+              Password
+            </label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" minLength={6} placeholder="Min. 6 characters" style={inputStyle} />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">{error}</p>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--terracotta-700)', background: 'var(--terracotta-100)', padding: '10px 12px', borderRadius: 'var(--radius-md)', margin: 0 }}>
+              {error}
+            </p>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-teal text-white font-medium py-2.5 rounded-md hover:bg-teal-dark transition-colors disabled:opacity-60"
-          >
+          <button type="submit" disabled={loading} style={{ width: '100%', background: loading ? 'var(--disabled-bg)' : 'var(--action-primary)', color: loading ? 'var(--disabled-text)' : 'var(--text-on-inverse)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', padding: '11px', borderRadius: 'var(--radius-md)', border: 'none', cursor: loading ? 'not-allowed' : 'pointer' }}>
             {loading ? 'Creating account…' : 'Create free account'}
           </button>
         </form>
 
-        <p className="mt-6 text-xs text-center text-gray-400">
+        <p style={{ marginTop: 'var(--space-5)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', textAlign: 'center', color: 'var(--text-tertiary)' }}>
           By signing up you agree to our terms. No spam — ever.
         </p>
-        <p className="mt-4 text-sm text-center text-gray-500">
+        <p style={{ marginTop: 'var(--space-4)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', textAlign: 'center', color: 'var(--text-secondary)' }}>
           Already have an account?{' '}
-          <Link href="/login" className="text-teal hover:text-teal-dark font-medium">
+          <Link href="/login" style={{ color: 'var(--text-brand)', fontWeight: 'var(--fw-semibold)', textDecoration: 'none' }}>
             Sign in
           </Link>
         </p>

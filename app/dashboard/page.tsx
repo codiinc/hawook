@@ -29,38 +29,44 @@ export default async function DashboardPage() {
     .map((f) => f.projects as unknown as Project)
     .filter(Boolean) as Project[]
 
-  const email = user.email ?? ''
-
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-      <div className="mb-12">
-        <h1 className="font-serif text-3xl font-medium text-gray-900 mb-1">Welcome back</h1>
-        <p className="text-gray-500 text-sm">{email}</p>
+    <div style={{ maxWidth: 'var(--container)', margin: '0 auto', padding: 'var(--space-9) var(--gutter)' }}>
+      <div style={{ marginBottom: 'var(--space-9)' }}>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.75rem, 3vw, var(--text-display-3))', fontWeight: 'var(--fw-medium)', color: 'var(--text-brand)', margin: '0 0 var(--space-3)' }}>
+          Welcome back
+        </h1>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)', margin: 0 }}>
+          {user.email}
+        </p>
       </div>
 
-      {/* Followed projects */}
-      <section className="mb-16">
-        <h2 className="font-serif text-xl font-medium text-gray-900 mb-6">Followed projects</h2>
+      <section style={{ marginBottom: 'var(--space-10)' }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-title)', fontWeight: 'var(--fw-medium)', color: 'var(--text-brand)', margin: '0 0 var(--space-7)' }}>
+          Followed projects
+        </h2>
         {followedProjects.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--space-6)' }}>
             {followedProjects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         ) : (
-          <div className="bg-cream rounded-lg p-10 text-center">
-            <p className="text-gray-500 mb-4">You haven&apos;t followed any projects yet.</p>
-            <Link href="/projects" className="inline-flex items-center gap-1 text-teal font-medium hover:text-teal-dark">
+          <div style={{ background: 'var(--bg-tint)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--rule)', padding: 'var(--space-9)', textAlign: 'center' }}>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-body)', color: 'var(--text-secondary)', margin: '0 0 var(--space-5)' }}>
+              You haven&apos;t followed any projects yet.
+            </p>
+            <Link href="/projects" style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-brand)', textDecoration: 'none' }}>
               Browse projects →
             </Link>
           </div>
         )}
       </section>
 
-      {/* Recommended */}
       <section>
-        <h2 className="font-serif text-xl font-medium text-gray-900 mb-6">You might also like</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-title)', fontWeight: 'var(--fw-medium)', color: 'var(--text-brand)', margin: '0 0 var(--space-7)' }}>
+          You might also like
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--space-6)' }}>
           {(recommended ?? []).map((project) => (
             <ProjectCard key={project.id} project={project as Project} />
           ))}
