@@ -6,10 +6,11 @@ import { renderNewLeadAlert } from '@/lib/email-templates/new-lead-alert'
 
 const YOGI_EMAIL = 'yogi@hawook.com'
 
-export async function POST(
-  request: Request,
-  { params }: { params: { slug: string } }
-) {
+type Params = { params: Promise<{ slug: string }> }
+
+export async function POST(request: Request, { params }: Params) {
+  const { slug } = await params
+
   // Auth required — this endpoint is member-only
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -41,7 +42,7 @@ export async function POST(
   const { data: projectRow } = await supabase
     .from('projects_public')
     .select('id, project_name')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .single()
 
   if (!projectRow) {
