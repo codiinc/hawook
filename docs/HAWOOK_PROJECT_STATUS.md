@@ -278,13 +278,13 @@ Auto-approval rules, bulk actions, multi-VA support, intent scoring algorithm, s
 
 | Dependency | Owner | Status |
 |---|---|---|
-| `app.hawook.com` CNAME at registrar | Yogi | Requested, pending |
-| Resend SPF/DKIM/MX/DMARC records | Yogi | Requested, pending |
-| `hello@hawook.com` mailbox + forwarding to Yogi | Yogi | Requested, pending |
-| `system@hawook.com` mailbox + forwarding to Codi | Yogi | Requested, pending |
-| Verify all Resend records green | Codi | Blocked on Yogi |
+| `app.hawook.com` CNAME at registrar | Yogi | ✅ DONE — live as of Sep 2026 |
+| Resend SPF/DKIM/MX/DMARC records | Yogi | ✅ DONE — verified Sep 2026 |
+| `hello@hawook.com` mailbox + forwarding to Yogi | Yogi | Unconfirmed — check with Yogi |
+| `system@hawook.com` mailbox + forwarding to Codi | Yogi | Unconfirmed — check with Yogi |
+| Verify all Resend records green | Codi | Likely resolved — confirm in Resend dashboard |
 
-When all five resolve, the lead-capture email triggers (templates #5 and #7) become fully verified. Welcome email (#6) trigger also completes. No code change needed at that point.
+Lead-capture email triggers (#5, #7) and welcome email (#6) should now be active. Confirm by submitting a test lead and checking delivery.
 
 ---
 
