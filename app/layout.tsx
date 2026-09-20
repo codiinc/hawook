@@ -22,6 +22,17 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@hawook',
   },
+  icons: {
+    icon: [
+      { url: '/favicons/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicons/favicon-dark-32.png', sizes: '32x32', type: 'image/png', media: '(prefers-color-scheme: dark)' },
+      { url: '/favicons/icon-192-navy.png', sizes: '192x192', type: 'image/png' },
+      { url: '/favicons/icon-512-navy.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/favicons/icon-180-navy.png', sizes: '180x180', type: 'image/png' }],
+    other: [{ rel: 'mask-icon', url: '/favicons/safari-pinned-tab.svg', color: '#012C57' }],
+  },
+  manifest: '/site.webmanifest',
 }
 
 const orgSchema = {
