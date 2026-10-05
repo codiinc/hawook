@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import ProjectCard from '@/components/ProjectCard'
 import NewsletterSignup from '@/components/NewsletterSignup'
+import { DataFeedSection } from '@/components/DataFeedSection'
 import type { Project } from '@/lib/types'
 
 export const metadata: Metadata = {
@@ -160,6 +161,8 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+      <DataFeedSection />
 
       <NewsletterSignup />
     </>
