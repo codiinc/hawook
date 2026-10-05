@@ -46,6 +46,7 @@ export default function Footer() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               <li><Link href="/projects" style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-on-inverse-muted)', textDecoration: 'none' }}>Projects</Link></li>
               <li><Link href="/areas/rawai-nai-harn" style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-on-inverse-muted)', textDecoration: 'none' }}>Rawai &amp; Nai Harn</Link></li>
+              <li><Link href="/areas/bang-tao" style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-on-inverse-muted)', textDecoration: 'none' }}>Bang Tao</Link></li>
               <li><Link href="/articles" style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-on-inverse-muted)', textDecoration: 'none' }}>Articles</Link></li>
               <li><Link href="/about" style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-on-inverse-muted)', textDecoration: 'none' }}>About</Link></li>
             </ul>

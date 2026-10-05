@@ -36,6 +36,19 @@ function formatPriceTHB(amount: number | null): string {
   return 'THB ' + amount.toLocaleString('en-US')
 }
 
+const AUTHORING_NOTE_PATTERNS = [
+  /^voice\s*&\s*knowledge\s*base/i,
+  /^\[.*\]$/,
+  /^---+\s*authoring/i,
+]
+
+function stripAuthoringNotes(text: string): string {
+  return text
+    .split('\n\n')
+    .filter((para) => !AUTHORING_NOTE_PATTERNS.some((re) => re.test(para.trim())))
+    .join('\n\n')
+}
+
 function findBeachDistance(landmarks: string | null): string | null {
   if (!landmarks) return null
   const line = landmarks.split('\n').find((l) => l.toLowerCase().includes('beach'))
@@ -144,8 +157,10 @@ export default async function ProjectPage({ params }: Props) {
   const coverImageType = s('cover_image_type')
   const galleryUrlsRaw = raw['gallery_urls']
   const galleryTypesRaw = raw['gallery_types']
-  const hawookIntro = s('hawook_intro')
-  const hawookTakeText = s('hawook_take')
+  const hawookIntroRaw = s('hawook_intro')
+  const hawookTakeRaw = s('hawook_take')
+  const hawookIntro = hawookIntroRaw ? stripAuthoringNotes(hawookIntroRaw) : null
+  const hawookTakeText = hawookTakeRaw ? stripAuthoringNotes(hawookTakeRaw) : null
   const hawookScore = num('hawook_score')
   const hawookVerdict = s('hawook_verdict')
   const locationDescription = s('location_description')
