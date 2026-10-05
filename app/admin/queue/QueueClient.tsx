@@ -297,6 +297,20 @@ export default function QueueClient({
     setLoading(null)
   }
 
+  const handleRetry = async (id: string) => {
+    setLoading(id)
+    const res = await fetch(`/api/admin/proposals/${id}/retry`, { method: 'POST' })
+    const json = await res.json() as { ok?: boolean; error?: string }
+    if (res.ok && json.ok) {
+      removeFromList(id)
+      setExpanded(null)
+      alert('Proposal reset to pending — reload the queue to see it.')
+    } else {
+      alert(`Reset failed: ${json.error ?? 'Unknown error'}`)
+    }
+    setLoading(null)
+  }
+
   const handleBulkApproveMinor = async () => {
     setBulkLoading(true)
     const minors = proposals.filter(p => p.severity === 'minor')
@@ -452,7 +466,9 @@ export default function QueueClient({
                   {p.target_slug ?? p.target_table} — {p.update_type}
                 </p>
                 <p className="text-xs text-gray-400">
-                  {p.fields_changed ? `${p.fields_changed.length} field${p.fields_changed.length !== 1 ? 's' : ''}` : 'No field changes'}
+                  {p.fields_changed && p.fields_changed.length > 0
+                    ? `${p.fields_changed.length} field${p.fields_changed.length !== 1 ? 's' : ''}: ${p.fields_changed.map(f => f.field).join(', ')}`
+                    : 'No field changes'}
                   {p.related_update_entry ? ' + 1 update entry' : ''}
                 </p>
               </div>
@@ -739,59 +755,70 @@ export default function QueueClient({
                 {/* Action buttons */}
                 {canApprove ? (
                   <div className="flex flex-wrap gap-2 pt-1">
-                    <button
-                      onClick={() => handleApprove(p.id, false)}
-                      disabled={loading === p.id}
-                      className="text-sm px-4 py-2 bg-teal text-white rounded-md hover:opacity-90 disabled:opacity-50"
-                    >
-                      {loading === p.id ? 'Applying…' : 'Approve'}
-                    </button>
-                    <button
-                      onClick={() => toggleEditMode(p.id, p)}
-                      disabled={loading === p.id}
-                      className={`text-sm px-4 py-2 rounded-md border transition-colors ${
-                        editMode.has(p.id)
-                          ? 'bg-amber-50 text-amber-700 border-amber-300'
-                          : 'text-gray-700 border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      {editMode.has(p.id) ? 'Cancel edit' : 'Approve & edit'}
-                    </button>
-                    {editMode.has(p.id) && (
+                    {p.status === 'failed' && (
+                      <button
+                        onClick={() => handleRetry(p.id)}
+                        disabled={loading === p.id}
+                        className="text-sm px-4 py-2 bg-amber-600 text-white rounded-md hover:opacity-90 disabled:opacity-50"
+                      >
+                        {loading === p.id ? 'Resetting…' : 'Reset to pending'}
+                      </button>
+                    )}
+                    {p.status !== 'failed' && (<>
                       <button
                         onClick={() => handleApprove(p.id, false)}
                         disabled={loading === p.id}
-                        className="text-sm px-4 py-2 bg-amber-500 text-white rounded-md hover:opacity-90 disabled:opacity-50"
+                        className="text-sm px-4 py-2 bg-teal text-white rounded-md hover:opacity-90 disabled:opacity-50"
                       >
-                        Apply edits
+                        {loading === p.id ? 'Applying…' : 'Approve'}
                       </button>
-                    )}
-                    <button
-                      onClick={() => {
-                        const next = new Set(notifHold)
-                        if (next.has(p.id)) next.delete(p.id); else next.add(p.id)
-                        setNotifHold(next)
-                        handleApprove(p.id, true)
-                      }}
-                      disabled={loading === p.id}
-                      className="text-sm px-4 py-2 text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Approve, hold notifications
-                    </button>
-                    <button
-                      onClick={() => handleReject(p.id)}
-                      disabled={loading === p.id}
-                      className="text-sm px-4 py-2 text-red-600 border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
-                    >
-                      Reject
-                    </button>
-                    <button
-                      onClick={() => handleDefer(p.id)}
-                      disabled={loading === p.id}
-                      className="text-sm px-4 py-2 text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Defer
-                    </button>
+                      <button
+                        onClick={() => toggleEditMode(p.id, p)}
+                        disabled={loading === p.id}
+                        className={`text-sm px-4 py-2 rounded-md border transition-colors ${
+                          editMode.has(p.id)
+                            ? 'bg-amber-50 text-amber-700 border-amber-300'
+                            : 'text-gray-700 border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        {editMode.has(p.id) ? 'Cancel edit' : 'Approve & edit'}
+                      </button>
+                      {editMode.has(p.id) && (
+                        <button
+                          onClick={() => handleApprove(p.id, false)}
+                          disabled={loading === p.id}
+                          className="text-sm px-4 py-2 bg-amber-500 text-white rounded-md hover:opacity-90 disabled:opacity-50"
+                        >
+                          Apply edits
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          const next = new Set(notifHold)
+                          if (next.has(p.id)) next.delete(p.id); else next.add(p.id)
+                          setNotifHold(next)
+                          handleApprove(p.id, true)
+                        }}
+                        disabled={loading === p.id}
+                        className="text-sm px-4 py-2 text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        Approve, hold notifications
+                      </button>
+                      <button
+                        onClick={() => handleReject(p.id)}
+                        disabled={loading === p.id}
+                        className="text-sm px-4 py-2 text-red-600 border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
+                      >
+                        Reject
+                      </button>
+                      <button
+                        onClick={() => handleDefer(p.id)}
+                        disabled={loading === p.id}
+                        className="text-sm px-4 py-2 text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        Defer
+                      </button>
+                    </>)}
                   </div>
                 ) : (
                   <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded px-3 py-2">

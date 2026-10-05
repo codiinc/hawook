@@ -348,7 +348,7 @@ The full update_proposals row needs:
 
 - proposed_by: 'codi' (or 'yogi' once onboarded)
 - target_table: 'projects' | 'project_updates' | 'project_documents' | 'areas' | 'developers'
-- target_slug: the slug of the row being changed
+- target_slug: the slug of the row being changed — ALWAYS look this up from the database using MCP (`SELECT slug FROM projects WHERE project_name = '...'`). Never generate a slug by lower-casing or slugifying the project name — slugs may not follow the name directly (e.g. "Adora Rawai" → "adora-rawai" is coincidental; always verify). A wrong slug causes the approval to fail with no recoverable path.
 - target_record_id: the UUID (look up via MCP for field_update; null for new_record)
 - update_type: 'field_update' | 'new_record' | 'document_add' | 'blog_article'
 - severity: 'minor' | 'standard' | 'major'

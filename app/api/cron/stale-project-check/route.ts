@@ -36,9 +36,7 @@ export async function GET(request: NextRequest) {
 
   const cooldownThreshold = new Date(Date.now() - ALERT_COOLDOWN_DAYS * 24 * 3600 * 1000).toISOString()
 
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'https://app.hawook.com'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.hawook.com'
 
   const alertResults: { slug: string; alerted: boolean; reason?: string }[] = []
 

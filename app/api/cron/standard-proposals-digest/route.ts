@@ -39,15 +39,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ sent: false, reason: 'no_pending_standard_proposals' })
   }
 
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'https://app.hawook.com'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.hawook.com'
 
   const proposalItems = proposals.map(p => {
-    const fields = Array.isArray(p.fields_changed) ? p.fields_changed : []
+    const fields = Array.isArray(p.fields_changed) ? p.fields_changed as { field: string }[] : []
+    const fieldNames = fields.map(f => f.field).join(', ')
     const changeSummary = fields.length > 0
-      ? `${fields.length} field${fields.length !== 1 ? 's' : ''} changed`
-      : 'field update'
+      ? `${fields.length} field${fields.length !== 1 ? 's' : ''}: ${fieldNames}`
+      : 'no field changes'
     return {
       targetName: (p.target_slug as string) ?? 'Unknown',
       changeSummary,
