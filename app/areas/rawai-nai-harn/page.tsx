@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import MarkdownContent from '@/components/MarkdownContent'
 import ProjectCard from '@/components/ProjectCard'
+import { EmbeddedMap } from '@/components/EmbeddedMap'
 import type { Project } from '@/lib/types'
 
 export const metadata: Metadata = {
@@ -89,6 +90,14 @@ export default async function RawaiNaiHarnPage() {
     <div style={{ maxWidth: 'var(--container)', margin: '0 auto', padding: 'var(--space-9) var(--gutter)' }}>
       <div style={{ maxWidth: 'var(--container-narrow)' }}>
         <MarkdownContent content={editorialContent} />
+      </div>
+
+      {/* Map — Rawai & Nai Harn headland */}
+      <div style={{ marginTop: 'var(--space-10)', maxWidth: 'var(--container-narrow)' }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display-4)', fontWeight: 'var(--fw-medium)', color: 'var(--text-brand)', margin: '0 0 var(--space-5)' }}>
+          Where is Rawai &amp; Nai Harn?
+        </h2>
+        <EmbeddedMap lat={7.775} lon={98.332} zoom={13} height={340} label="Rawai and Nai Harn area map" />
       </div>
 
       <div style={{ marginTop: 'var(--space-10)' }}>

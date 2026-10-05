@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import MarkdownContent from '@/components/MarkdownContent'
 import ProjectCard from '@/components/ProjectCard'
+import { EmbeddedMap } from '@/components/EmbeddedMap'
 import type { Project } from '@/lib/types'
 
 export const metadata: Metadata = {
@@ -13,14 +14,24 @@ export const metadata: Metadata = {
     title: 'Bang Tao Property Guide',
     description: 'Bang Tao is Phuket\'s premium resort and beachfront residence area — a 6-kilometre stretch of Andaman Sea coast anchored by Laguna Phuket.',
     url: 'https://app.hawook.com/areas/bang-tao',
+    images: [
+      {
+        url: 'https://res.cloudinary.com/dq5a1hiut/image/upload/v1782223601/hawook/areas/bang-tao-hero.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Bang Tao, Phuket — beach club at sunset',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Bang Tao Property Guide',
+    description: 'Bang Tao is Phuket\'s premium resort and beachfront residence area — a 6-kilometre stretch of Andaman Sea coast anchored by Laguna Phuket.',
+    images: ['https://res.cloudinary.com/dq5a1hiut/image/upload/v1782223601/hawook/areas/bang-tao-hero.jpg'],
   },
 }
 
 const editorialContent = `
-# Bang Tao
-
-Western Phuket. The high-end coast.
-
 Bang Tao is Phuket's premium resort and beachfront residence area — a 6-kilometre stretch of Andaman Sea coast that runs from Layan Beach in the north to Surin Beach in the south. The area is anchored by Laguna Phuket, the original integrated resort development that defined the model for branded residential property in Phuket and continues to set the tone for the surrounding neighbourhoods. The major five-star hotel brands cluster here. The international schools — particularly UWC Thailand and BCIS — are within a 10-15 minute drive. This is the area where most buyers spending 10M+ THB on a second home in Phuket end up looking.
 
 Hawook covers Bang Tao as our second priority area after Rawai and Nai Harn. The catalog is more selective here because the inventory is enormous — there are more developments launching in Bang Tao than any other Phuket area, and the variation in developer quality, design integrity, and pricing logic is wider than anywhere else on the island. Curation matters more here precisely because the volume is so high. We review carefully and list only the developments we'd recommend to a buyer paying 10M-50M THB for a second home or investment property.
@@ -92,7 +103,50 @@ export default async function BangTaoPage() {
   return (
     <div style={{ maxWidth: 'var(--container)', margin: '0 auto', padding: 'var(--space-9) var(--gutter)' }}>
       <div style={{ maxWidth: 'var(--container-narrow)' }}>
+        <h1 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'clamp(2rem, 4vw, var(--text-display-3))',
+          fontWeight: 'var(--fw-medium)',
+          color: 'var(--text-brand)',
+          lineHeight: 'var(--lh-title)',
+          letterSpacing: 'var(--tracking-display)',
+          margin: '0 0 var(--space-3)',
+        }}>
+          Bang Tao
+        </h1>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)', fontStyle: 'italic', margin: '0 0 var(--space-8)' }}>
+          Western Phuket. The high-end coast.
+        </p>
         <MarkdownContent content={editorialContent} />
+
+        {/* Cross-links */}
+        <div style={{ marginTop: 'var(--space-8)', padding: 'var(--space-6)', background: 'var(--bg-tint)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--rule-brand)' }}>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 'var(--fw-semibold)', color: 'var(--text-primary)', margin: '0 0 var(--space-3)' }}>
+            Related reading
+          </p>
+          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <li>
+              <Link href="/articles/bang-tao-land-seizure-phuket" style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--action-primary)', textDecoration: 'none' }}>
+                → The Bang Tao land-seizure cases: what buyers need to know
+              </Link>
+            </li>
+            {projectList.map(p => (
+              <li key={p.id}>
+                <Link href={`/projects/${p.slug}`} style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--action-primary)', textDecoration: 'none' }}>
+                  → {p.project_name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Map — Bang Tao beach area */}
+      <div style={{ marginTop: 'var(--space-10)', maxWidth: 'var(--container-narrow)' }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-display-4)', fontWeight: 'var(--fw-medium)', color: 'var(--text-brand)', margin: '0 0 var(--space-5)' }}>
+          Where is Bang Tao?
+        </h2>
+        <EmbeddedMap lat={7.972} lon={98.293} zoom={13} height={340} label="Bang Tao area map" />
       </div>
 
       <div style={{ marginTop: 'var(--space-10)' }}>
