@@ -17,6 +17,7 @@ import { VerdictCards } from '@/components/ds/VerdictCards'
 import { MarketCompGrid } from '@/components/ds/MarketCompGrid'
 import { YieldCalc } from '@/components/ds/YieldCalc'
 import { BuyerQualForm } from '@/components/ds/BuyerQualForm'
+import { StickyProjectCTA } from '@/components/ds/StickyProjectCTA'
 
 const DOC_TYPE_LABELS: Record<string, string> = {
   sales_presentation: 'Sales presentation',
@@ -306,6 +307,12 @@ export default async function ProjectPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       )}
+
+      <StickyProjectCTA
+        projectName={projectName}
+        projectSlug={slug}
+        isLoggedIn={!!user}
+      />
 
       {/* 1. Hero — full-bleed */}
       <ProjectHero

@@ -24,7 +24,8 @@ export function ProjectHero({
   const isRecommended = hawookScore != null && hawookScore >= 8.0 && hawookScore < 9.0
   const showBadge = isTopPick || isRecommended
 
-  const subLineParts = [developerName, area, handoverDate].filter(Boolean)
+  const byline = developerName ? `by ${developerName}` : null
+  const subLineParts = [byline, area, handoverDate].filter(Boolean)
 
   return (
     <div

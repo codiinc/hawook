@@ -10,19 +10,25 @@ interface LandmarkRow {
 }
 
 function parseLandmarks(raw: string): LandmarkRow[] {
-  return raw
-    .split('\n')
-    .filter(Boolean)
-    .map((line) => {
-      const colonIdx = line.lastIndexOf(':')
-      if (colonIdx > 0) {
-        return {
-          name: line.slice(0, colonIdx).trim(),
-          distance: line.slice(colonIdx + 1).trim(),
-        }
-      }
-      return { name: line.trim(), distance: null }
-    })
+  // Support both newline-separated (legacy "Name: distance") and
+  // semicolon-separated ("Name 400m / 5 min walk; Name2 1.4km") formats
+  const lines = raw.includes(';')
+    ? raw.split(';').map((s) => s.trim()).filter(Boolean)
+    : raw.split('\n').filter(Boolean)
+
+  return lines.map((line) => {
+    // Try colon format first: "Rawai Beach: 400m"
+    const colonIdx = line.lastIndexOf(':')
+    if (colonIdx > 0 && colonIdx < line.length - 1 && !line.slice(colonIdx + 1).includes('//')) {
+      return { name: line.slice(0, colonIdx).trim(), distance: line.slice(colonIdx + 1).trim() }
+    }
+    // Try distance-suffix format: "Rawai Beach 400m / 5 min walk" or "Yanui Beach 1.4km"
+    const distMatch = line.match(/^(.*?)\s+(\d[\d.,]*(m|km)\b.*)$/i)
+    if (distMatch) {
+      return { name: distMatch[1].trim(), distance: distMatch[2].trim() }
+    }
+    return { name: line.trim(), distance: null }
+  })
 }
 
 export function LocationSection({
@@ -66,9 +72,10 @@ export function LocationSection({
 
       {landmarks.length > 0 && (
         <div
+          className="location-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 380px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '48px',
             alignItems: 'start',
           }}
