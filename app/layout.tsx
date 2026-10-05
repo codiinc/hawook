@@ -5,6 +5,7 @@ import Nav from '@/components/Nav'
 import AnalyticsEvents from '@/components/AnalyticsEvents'
 import FooterWrapper from '@/components/FooterWrapper'
 import CookieConsent from '@/components/CookieConsent'
+import { CurrencyProvider } from '@/components/CurrencyContext'
 
 export const metadata: Metadata = {
   title: {
@@ -93,9 +94,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
         <AnalyticsEvents />
-        <Nav />
-        <main>{children}</main>
-        <FooterWrapper />
+        <CurrencyProvider>
+          <Nav />
+          <main>{children}</main>
+          <FooterWrapper />
+        </CurrencyProvider>
         <CookieConsent />
       </body>
     </html>

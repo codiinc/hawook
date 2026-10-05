@@ -1,3 +1,5 @@
+import { EmbeddedMap, parseLatLon } from '@/components/EmbeddedMap'
+
 interface LocationSectionProps {
   locationDescription: string | null
   nearbyLandmarks: string | null
@@ -37,6 +39,7 @@ export function LocationSection({
   googleMapsUrl,
 }: LocationSectionProps) {
   const landmarks = nearbyLandmarks ? parseLandmarks(nearbyLandmarks) : []
+  const coords = parseLatLon(googleMapsUrl)
 
   return (
     <section>
@@ -81,37 +84,18 @@ export function LocationSection({
           }}
         >
           {/* Map */}
-          <div
-            style={{
-              height: '340px',
-              borderRadius: '2px',
-              overflow: 'hidden',
-              background: 'var(--sand-300)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {googleMapsUrl ? (
-              <iframe
-                src={googleMapsUrl}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Project location map"
-              />
+          <div>
+            {coords ? (
+              <EmbeddedMap lat={coords.lat} lon={coords.lon} height={340} label="Project location map" />
             ) : (
-              <span
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '13px',
-                  color: 'var(--ink-400)',
-                }}
-              >
-                Map
-              </span>
+              <div style={{ height: 340, borderRadius: 'var(--radius-sm)', background: 'var(--sand-200)', border: '1px solid var(--rule)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <span style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'var(--ink-400)' }}>Map coming soon</span>
+                {googleMapsUrl && (
+                  <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: 'var(--action-primary)', textDecoration: 'none' }}>
+                    View on Google Maps ↗
+                  </a>
+                )}
+              </div>
             )}
           </div>
 

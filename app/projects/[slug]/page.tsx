@@ -18,6 +18,8 @@ import { MarketCompGrid } from '@/components/ds/MarketCompGrid'
 import { YieldCalc } from '@/components/ds/YieldCalc'
 import { BuyerQualForm } from '@/components/ds/BuyerQualForm'
 import { StickyProjectCTA } from '@/components/ds/StickyProjectCTA'
+import { CurrencyToggle } from '@/components/CurrencyToggle'
+import { PriceDisplay } from '@/components/PriceDisplay'
 
 const DOC_TYPE_LABELS: Record<string, string> = {
   sales_presentation: 'Sales presentation',
@@ -330,6 +332,19 @@ export default async function ProjectPage({ params }: Props) {
 
       {/* Container wrapper for interior sections */}
       <div style={container}>
+
+        {/* Currency toggle */}
+        {priceMin != null && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 16px', padding: 'var(--space-5) 0', borderBottom: '1px solid var(--rule)' }}>
+            <span style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'var(--text-secondary)' }}>
+              Price from <PriceDisplay thb={priceMin} style={{ fontWeight: 600, color: 'var(--text-primary)' }} />
+            </span>
+            <CurrencyToggle variant="inline" />
+            <span style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>
+              THB is the contract currency
+            </span>
+          </div>
+        )}
 
         {/* 3. Score section */}
         {hawookScore != null && (

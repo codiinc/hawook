@@ -1,8 +1,10 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
-import { formatPriceFrom } from '@/lib/format'
 import type { Project } from '@/lib/types'
 import HawookBadge from '@/components/HawookBadge'
+import { PriceDisplay } from '@/components/PriceDisplay'
 
 const BLUR_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTVlN2ViIi8+PC9zdmc+'
 
@@ -98,7 +100,10 @@ export default function ProjectCard({ project }: Props) {
           color: 'var(--text-primary)',
           marginBottom: teaser ? 'var(--space-4)' : 0,
         }}>
-          {formatPriceFrom(project.price_min)}
+          {project.price_min != null
+            ? <><PriceDisplay thb={project.price_min} prefix="From " /></>
+            : 'Price on request'
+          }
         </p>
         {teaser && (
           <p style={{
