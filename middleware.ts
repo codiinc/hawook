@@ -113,39 +113,45 @@ export async function middleware(request: NextRequest) {
   // Long-tail WP URLs that aren't in the explicit map return 404 naturally —
   // Google needs to crawl and drop them. No special handling needed.
 
-  // ── Supabase auth session refresh (existing) ──────────────────────────────
-  let supabaseResponse = NextResponse.next({ request })
+  // ── Supabase auth: only run for /dashboard routes ────────────────────────
+  // Scoped to /dashboard so Supabase env vars are not needed when Next.js
+  // prerenderers static public pages (login, signup, etc.) at build time.
+  if (pathname.startsWith('/dashboard')) {
+    let supabaseResponse = NextResponse.next({ request })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) =>
+              request.cookies.set(name, value)
+            )
+            supabaseResponse = NextResponse.next({ request })
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            )
+          },
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
-          supabaseResponse = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
+      }
+    )
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      return NextResponse.redirect(url)
     }
-  )
 
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user && pathname.startsWith('/dashboard')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
+    return supabaseResponse
   }
 
-  return supabaseResponse
+  return NextResponse.next({ request })
 }
 
 export const config = {
