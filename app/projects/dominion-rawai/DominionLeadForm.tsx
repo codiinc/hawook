@@ -12,16 +12,13 @@ export default function DominionLeadForm() {
     if (!name.trim() || !email.trim()) return
     setState('loading')
     try {
-      const res = await fetch('/api/leads', {
+      const res = await fetch('/api/leads/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          full_name: name.trim(),
+          name: name.trim(),
           email: email.trim(),
-          project_context: 'dominion-rawai',
-          source: 'dominion_placeholder',
-          message: 'Notify me when Dominion Rawai profile publishes.',
-          subscribe_newsletter: false,
+          project_slug: 'dominion-rawai',
         }),
       })
       setState(res.ok ? 'done' : 'error')
