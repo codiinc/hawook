@@ -1,6 +1,7 @@
 'use client'
 
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import type { Components } from 'react-markdown'
 
 const components: Components = {
@@ -41,6 +42,26 @@ const components: Components = {
   a: ({ href, children }) => (
     <a href={href} className="text-teal underline hover:text-teal-dark transition-colors" target="_blank" rel="noopener noreferrer">{children}</a>
   ),
+  table: ({ children }) => (
+    <div className="overflow-x-auto my-6">
+      <table className="w-full border-collapse text-sm">{children}</table>
+    </div>
+  ),
+  thead: ({ children }) => (
+    <thead className="bg-gray-50">{children}</thead>
+  ),
+  tbody: ({ children }) => (
+    <tbody>{children}</tbody>
+  ),
+  tr: ({ children }) => (
+    <tr className="border-b border-gray-200">{children}</tr>
+  ),
+  th: ({ children }) => (
+    <th className="px-4 py-2 text-left font-semibold text-gray-900 border border-gray-200">{children}</th>
+  ),
+  td: ({ children }) => (
+    <td className="px-4 py-2 text-gray-700 border border-gray-200">{children}</td>
+  ),
 }
 
 type Props = {
@@ -51,7 +72,7 @@ type Props = {
 export default function MarkdownContent({ content, className = '' }: Props) {
   return (
     <div className={className}>
-      <ReactMarkdown components={components}>{content}</ReactMarkdown>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>{content}</ReactMarkdown>
     </div>
   )
 }
