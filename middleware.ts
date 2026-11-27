@@ -38,6 +38,13 @@ const EXACT_REDIRECTS: Record<string, string> = {
   '/kamala-guide':      '/articles/kamala-area-guide-property-buyers-2026',
   '/phuket-town-guide': '/articles/phuket-town-area-guide-property-buyers',
   '/phuket-town-area':  '/articles/phuket-town-area-guide-property-buyers',
+  '/rawai-guide':              '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  '/rawai-area-guide':         '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  '/rawai-area':               '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  '/nai-harn-guide':           '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  '/rawai-nai-harn-guide':     '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  '/rawai-nai-harn-buyer-guide': '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  // ⚠️ S9 UPDATE: 7 Rawai cluster entries pending — paste source URLs from todo 5152aba6
 
   // ⚠️ FLAGGED — destination slugs not confirmed in DB; Migration Runner to verify before merge:
   '/where-to-buy-property-in-thailand-in-2025-top-locations-compared':
