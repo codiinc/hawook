@@ -27,7 +27,7 @@ const EXACT_REDIRECTS: Record<string, string> = {
 
   // ── Rent-to-own ───────────────────────────────────────────────────────────
   '/thailand-rent-to-own-property-explained':
-    '/articles/thailand-rent-to-own-property-explained-how-rto-unlocks-buyers-and-protects-developers',
+    '/guides/thailand-rent-to-own-property-explained-how-rto-unlocks-buyers-and-protects-developers',
 
   // ── Area guides ──────────────────────────────────────────────────────────
   '/bang-tao-guide':    '/articles/bang-tao-area-guide-property-buyers-2026',
@@ -44,19 +44,26 @@ const EXACT_REDIRECTS: Record<string, string> = {
   '/nai-harn-guide':           '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
   '/rawai-nai-harn-guide':     '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
   '/rawai-nai-harn-buyer-guide': '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
-  // ⚠️ S9 UPDATE: 7 Rawai cluster entries pending — paste source URLs from todo 5152aba6
+  // ── Rawai cluster (S9 update — verified by Migration Runner) ─────────────
+  '/expat-life-living-in-phuket-with-a-family':                  '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  '/rawai-property-developments-is-this-phukets-last-smart-buy': '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  '/investing-in-rawai-nai-harn-south-phuket':                   '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  '/top-restaurants-in-rawai-and-naiharn':                       '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  '/area-overview-rawai-phuket':                                  '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  '/properties-in-rawai':                                         '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
+  '/properties-in-nai-harn':                                      '/articles/rawai-nai-harn-area-guide-property-buyers-2026',
 
-  // ⚠️ FLAGGED — destination slugs not confirmed in DB; Migration Runner to verify before merge:
+  // ── Buyer intent / market articles (destinations verified by Migration Runner) ──
   '/where-to-buy-property-in-thailand-in-2025-top-locations-compared':
-    '/articles/where-to-buy-property-thailand-2026',          // ⚠️ verify slug exists
+    '/articles/where-to-buy-phuket-area-guide-2026',
   '/where-to-buy-property-in-thailand-2025':
-    '/articles/where-to-buy-property-thailand-2026',          // ⚠️ verify slug exists
-  '/buy-property-with-crypto-in-thailand':
-    '/articles/buy-property-with-crypto-in-thailand-without-getting-flagged-or-taxed', // actual DB slug
+    '/articles/where-to-buy-phuket-area-guide-2026',
   '/best-places-to-buy-property-in-thailand-2025-edition':
-    '/articles/best-places-to-buy-property-thailand-2026',    // ⚠️ verify slug exists
+    '/articles/where-to-buy-phuket-area-guide-2026',
   '/best-places-to-buy-property-in-thailand-2025':
-    '/articles/best-places-to-buy-property-thailand-2026',    // ⚠️ verify slug exists
+    '/articles/where-to-buy-phuket-area-guide-2026',
+  '/buy-property-with-crypto-in-thailand':
+    '/guides/buy-property-with-crypto-in-thailand-without-getting-flagged-or-taxed',
 
   // ── Homepage / category roots ─────────────────────────────────────────────
   '/blog':    '/articles',
